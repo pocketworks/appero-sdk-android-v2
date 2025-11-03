@@ -13,3 +13,10 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+
+#Ignore cursor AI rules
+.cursor/rules/codacy.mdc
+
+#Ignore iOS reference directory
+/ios-reference/

@@ -31,10 +31,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 @Composable
 fun ApperoThemeProvider(
     theme: ApperoTheme = DefaultApperoTheme,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
-        LocalApperoTheme provides theme,
+        LOCAL_APPERO_THEME provides theme,
         content = content
     )
 }

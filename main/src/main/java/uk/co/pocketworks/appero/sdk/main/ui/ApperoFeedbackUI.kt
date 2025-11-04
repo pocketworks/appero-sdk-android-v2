@@ -55,7 +55,7 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.DefaultApperoTheme
 @Composable
 fun ApperoFeedbackUI(
     apperoInstance: Appero = Appero.instance,
-    theme: ApperoTheme = DefaultApperoTheme
+    theme: ApperoTheme = DefaultApperoTheme,
 ) {
     ApperoFeedbackBottomSheet(
         apperoInstance = apperoInstance,

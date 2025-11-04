@@ -50,6 +50,6 @@ interface ApperoTheme {
  * CompositionLocal for accessing the current Appero theme.
  * Use LocalApperoTheme.current to access theme values within composables.
  */
-val LocalApperoTheme = staticCompositionLocalOf<ApperoTheme> {
+val LOCAL_APPERO_THEME = staticCompositionLocalOf<ApperoTheme> {
     DefaultApperoTheme
 }

@@ -9,8 +9,8 @@
 
 package uk.co.pocketworks.appero.sdk.main.model
 
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * Internal data class representing error responses from the API.
@@ -19,7 +19,7 @@ import kotlinx.serialization.SerialName
 internal data class ApperoErrorResponse(
     val error: String? = null,
     val message: String? = null,
-    val details: ErrorDetails? = null
+    val details: ErrorDetails? = null,
 ) {
     /**
      * Returns a formatted error description string.
@@ -47,6 +47,5 @@ internal data class ApperoErrorResponse(
 internal data class ErrorDetails(
     @SerialName("user_id")
     val userId: List<String>? = null,
-    val value: List<String>? = null
+    val value: List<String>? = null,
 )
-

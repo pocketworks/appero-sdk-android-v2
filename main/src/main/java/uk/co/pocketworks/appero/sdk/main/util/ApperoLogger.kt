@@ -30,7 +30,7 @@ internal object ApperoLogger {
 
     /**
      * Logs a debug message with [Appero] prefix.
-     * 
+     *
      * @param message The message to log
      */
     fun log(message: String) {
@@ -39,4 +39,3 @@ internal object ApperoLogger {
         }
     }
 }
-

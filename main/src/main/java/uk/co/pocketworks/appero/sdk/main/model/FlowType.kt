@@ -18,13 +18,14 @@ import kotlinx.serialization.Serializable
 enum class FlowType(val apiValue: String) {
     /** Positive experience flow (API value: "normal") */
     POSITIVE("normal"),
-    
+
     /** Neutral experience flow (API value: "neutral") */
     NEUTRAL("neutral"),
-    
+
     /** Negative/frustration experience flow (API value: "frustration") */
-    NEGATIVE("frustration");
-    
+    NEGATIVE("frustration"),
+    ;
+
     companion object {
         /**
          * Returns the FlowType for the given API string value.
@@ -39,4 +40,3 @@ enum class FlowType(val apiValue: String) {
         }
     }
 }
-

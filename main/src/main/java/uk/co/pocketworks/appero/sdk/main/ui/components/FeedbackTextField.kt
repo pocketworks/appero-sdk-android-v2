@@ -29,7 +29,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import uk.co.pocketworks.appero.sdk.main.Appero
 import uk.co.pocketworks.appero.sdk.main.R
-import uk.co.pocketworks.appero.sdk.main.ui.theme.LocalApperoTheme
+import uk.co.pocketworks.appero.sdk.main.ui.theme.LOCAL_APPERO_THEME
 
 /**
  * WCAG-compliant feedback text input field.
@@ -54,9 +54,9 @@ fun FeedbackTextField(
     onValueChange: (String) -> Unit,
     placeholder: String,
     maxLength: Int = Appero.APPERO_FEEDBACK_MAX_LENGTH,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    val theme = LocalApperoTheme.current
+    val theme = LOCAL_APPERO_THEME.current
     val characterCount = value.length
 
     // Create character counter text for accessibility and display

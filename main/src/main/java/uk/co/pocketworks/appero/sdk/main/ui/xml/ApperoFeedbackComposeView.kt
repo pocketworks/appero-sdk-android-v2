@@ -56,7 +56,7 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.DefaultApperoTheme
 class ApperoFeedbackComposeView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : AbstractComposeView(context, attrs, defStyleAttr) {
 
     /**

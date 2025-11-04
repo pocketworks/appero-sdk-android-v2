@@ -56,7 +56,7 @@ fun RatingButton(
     rating: ExperienceRating,
     isSelected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     // Get content description for accessibility
     val contentDescription = stringResource(

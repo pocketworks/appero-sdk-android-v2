@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
 /**
  * Internal data class representing the complete persistent state of the Appero SDK.
  * This is stored in SharedPreferences as a JSON string.
- * 
+ *
  * @property unsentExperiences Queue of experiences that failed to send due to network issues
  * @property unsentFeedback Queue of feedback that failed to send due to network issues
  * @property feedbackPromptShouldDisplay Whether the feedback prompt should be shown
@@ -34,6 +34,5 @@ internal data class ApperoData(
         prompt = "Share your thoughts here"
     ),
     val lastPromptDate: @Serializable(with = InstantSerializer::class) Long? = null,
-    val flowType: FlowType = FlowType.NEUTRAL
+    val flowType: FlowType = FlowType.NEUTRAL,
 )
-

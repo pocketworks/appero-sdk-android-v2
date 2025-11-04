@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 
 /**
  * Internal data class representing queued feedback waiting to be sent.
- * 
+ *
  * @property date Timestamp in milliseconds since epoch of when the feedback was submitted
  * @property rating Rating value from 1 to 5
  * @property feedback Optional user-provided feedback text
@@ -22,5 +22,5 @@ import kotlinx.serialization.Serializable
 internal data class QueuedFeedback(
     val date: @Serializable(with = InstantSerializer::class) Long,
     val rating: Int,
-    val feedback: String? = null
+    val feedback: String? = null,
 )

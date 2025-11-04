@@ -38,7 +38,7 @@ import uk.co.pocketworks.appero.sdk.main.util.ApperoLogger
 internal object ApperoAPIClient {
     private const val BASE_URL = "https://app.appero.co.uk/api/v1"
     private const val TIMEOUT_MS = 10_000
-    
+
     /**
      * HTTP methods supported by the API.
      */
@@ -47,9 +47,9 @@ internal object ApperoAPIClient {
         POST,
         PUT,
         PATCH,
-        DELETE
+        DELETE,
     }
-    
+
     /**
      * Creates and configures the Ktor HttpClient instance.
      * @param isDebug Whether debug logging is enabled
@@ -57,18 +57,20 @@ internal object ApperoAPIClient {
     fun createHttpClient(isDebug: Boolean = false): HttpClient {
         return HttpClient(Android) {
             install(ContentNegotiation) {
-                json(Json {
-                    ignoreUnknownKeys = true
-                    isLenient = true
-                    encodeDefaults = false
-                })
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                        isLenient = true
+                        encodeDefaults = false
+                    }
+                )
             }
-            
+
             engine {
                 connectTimeout = TIMEOUT_MS
                 socketTimeout = TIMEOUT_MS
             }
-            
+
             if (isDebug) {
                 install(Logging) {
                     level = LogLevel.INFO
@@ -76,10 +78,10 @@ internal object ApperoAPIClient {
             }
         }
     }
-    
+
     /**
      * Sends an HTTP request to the Appero API.
-     * 
+     *
      * @param endpoint The API endpoint (e.g., "experiences", "feedback")
      * @param fields The request body fields as a map
      * @param method The HTTP method to use
@@ -92,15 +94,15 @@ internal object ApperoAPIClient {
         fields: Map<String, Any>,
         method: HttpMethod,
         authorization: String,
-        isDebug: Boolean = false
+        isDebug: Boolean = false,
     ): Result<ByteArray> {
         val client = createHttpClient(isDebug)
-        
+
         return try {
             val url = "$BASE_URL/$endpoint"
-            
+
             ApperoLogger.log("Sending $method request to $url")
-            
+
             val response: HttpResponse = when (method) {
                 HttpMethod.POST -> {
                     client.post(url) {
@@ -132,7 +134,7 @@ internal object ApperoAPIClient {
                     }
                 }
             }
-            
+
             handleResponse(response)
         } catch (e: Exception) {
             ApperoLogger.log("Request failed with exception: ${e.message}")
@@ -141,26 +143,26 @@ internal object ApperoAPIClient {
             client.close()
         }
     }
-    
+
     /**
      * Configures the HTTP request with headers and body.
      */
     private fun HttpRequestBuilder.configureRequest(
         fields: Map<String, Any>,
-        authorization: String
+        authorization: String,
     ) {
         headers {
             append("Authorization", "Bearer $authorization")
             append("Content-Type", "application/json; charset=utf-8")
         }
-        
+
         contentType(ContentType.Application.Json)
-        
+
         // Convert fields map to JSON string
         val jsonBody = buildJsonObject(fields).toString()
         setBody(jsonBody)
     }
-    
+
     /**
      * Builds a JsonObject from a map of fields.
      */
@@ -176,12 +178,12 @@ internal object ApperoAPIClient {
             }
         }
     }
-    
+
     /**
      * Handles the HTTP response and converts it to a Result.
      */
     private suspend fun handleResponse(
-        response: HttpResponse
+        response: HttpResponse,
     ): Result<ByteArray> {
         return when {
             response.status.value in 200..204 -> {
@@ -194,8 +196,8 @@ internal object ApperoAPIClient {
                     Result.failure(ApperoAPIError.NoData)
                 }
             }
-            response.status == HttpStatusCode.Unauthorized || 
-            response.status == HttpStatusCode.UnprocessableEntity -> {
+            response.status == HttpStatusCode.Unauthorized ||
+                response.status == HttpStatusCode.UnprocessableEntity -> {
                 try {
                     val errorResponse: ApperoErrorResponse = response.body()
                     ApperoLogger.log("Server error: ${errorResponse.description()}")
@@ -212,4 +214,3 @@ internal object ApperoAPIClient {
         }
     }
 }
-

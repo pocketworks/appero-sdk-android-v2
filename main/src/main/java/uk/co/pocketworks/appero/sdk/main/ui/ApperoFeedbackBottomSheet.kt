@@ -19,7 +19,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import uk.co.pocketworks.appero.sdk.main.Appero
@@ -59,7 +58,7 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.DefaultApperoTheme
 fun ApperoFeedbackBottomSheet(
     apperoInstance: Appero = Appero.instance,
     theme: ApperoTheme = DefaultApperoTheme,
-    onDismiss: () -> Unit = { apperoInstance.dismissApperoPrompt() }
+    onDismiss: () -> Unit = { apperoInstance.dismissApperoPrompt() },
 ) {
     // Observe StateFlows
     val shouldShow by apperoInstance.shouldShowFeedbackPrompt.collectAsState()
@@ -166,5 +165,5 @@ fun ApperoFeedbackBottomSheet(
 private enum class Screen {
     Rating,
     FeedbackInput,
-    ThankYou
+    ThankYou,
 }

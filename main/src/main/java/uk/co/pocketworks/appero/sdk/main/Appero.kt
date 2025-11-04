@@ -196,7 +196,7 @@ class Appero private constructor() : LifecycleEventObserver {
         }
 
         // Load existing ApperoData
-        val loadedData = dataStorage?.load(debug)?.getOrNull() ?: ApperoData()
+        val loadedData = dataStorage?.load()?.getOrNull() ?: ApperoData()
         apperoDataState.value = loadedData
 
         // Update StateFlows with loaded data
@@ -387,7 +387,7 @@ class Appero private constructor() : LifecycleEventObserver {
         userPreferencesStorage?.clearUserId()
 
         // Clear ApperoData
-        dataStorage?.clear(debug)
+        dataStorage?.clear()
 
         // Reset instance variables
         userId = null
@@ -414,7 +414,7 @@ class Appero private constructor() : LifecycleEventObserver {
         requestData: Map<String, Any>,
         item: T,
         queueAction: (T) -> Unit,
-        onSuccess: suspend (ByteArray) -> Unit = {}
+        onSuccess: suspend (ByteArray) -> Unit = {},
     ) {
         val isConnected = networkMonitor?.isConnected?.first() ?: false
 
@@ -538,6 +538,7 @@ class Appero private constructor() : LifecycleEventObserver {
 
         updateApperoData { updatedData }
 
+        @Suppress("ForbiddenComment")
         if (shouldShow) {
             // TODO: Post notification for XML-based apps if needed
         }
@@ -549,7 +550,7 @@ class Appero private constructor() : LifecycleEventObserver {
         apperoDataState.value = updatedData
 
         // Persist to storage
-        dataStorage?.save(updatedData, debug)
+        dataStorage?.save(updatedData)
 
         // Update StateFlows
         updateStateFlows(updatedData)

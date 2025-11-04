@@ -1,15 +1,18 @@
 ---
 alwaysApply: true
 ---
+
 # WCAG 2.2 AA Accessibility Checklist for Flutter Mobile Apps
 
-This checklist ensures compliance with WCAG 2.2 Level AA applied to native mobile apps built with Flutter, focusing on Android and iOS handheld and tablet devices.
+This checklist ensures compliance with WCAG 2.2 Level AA applied to native mobile apps built with Flutter, focusing on
+Android and iOS handheld and tablet devices.
 
 ---
 
 ## Platform & Development Context
 
-- Use Flutter **Semantics** widget to provide accessibility roles, states, and labels to all interactive and informative UI elements.
+- Use Flutter **Semantics** widget to provide accessibility roles, states, and labels to all interactive and informative
+  UI elements.
 - Support native screen readers: **VoiceOver** (iOS) and **TalkBack** (Android).
 - Test semantic node integrity and placement to ensure accurate screen reader announcements.
 
@@ -18,7 +21,8 @@ This checklist ensures compliance with WCAG 2.2 Level AA applied to native mobil
 ## User Input & Interaction
 
 - **Touch target size:** Minimum 48x48 density-independent pixels (dp) for all tappable and interactive elements.
-- Provide descriptive **labels** and meaningful **states** for all interactive components (buttons, checkboxes, inputs, selectors).
+- Provide descriptive **labels** and meaningful **states** for all interactive components (buttons, checkboxes, inputs,
+  selectors).
 - Support platform-native gestures but avoid requiring complex or custom gestures without accessible alternatives.
 - Provide clear feedback on user input errors and suggest corrections where possible.
 - Allow **undo** options on important user actions.
@@ -29,8 +33,10 @@ This checklist ensures compliance with WCAG 2.2 Level AA applied to native mobil
 ## Visual and Text Requirements
 
 - Maintain a minimum **contrast ratio** of 4.5:1 for normal text and 3:1 for large text (18pt or 14pt bold).
-- Convey information by more than color, shape, size alone. For example, use underlines or icons in addition to color changes.
-- Support user customization for **text size** and **contrast**, ensuring layouts remain usable and legible when scaled up to 200% or more.
+- Convey information by more than color, shape, size alone. For example, use underlines or icons in addition to color
+  changes.
+- Support user customization for **text size** and **contrast**, ensuring layouts remain usable and legible when scaled
+  up to 200% or more.
 - Support user customization for reducing transparency and reducing animation.
 - Avoid low-contrast UI elements such as disabled buttons that are unreadable.
 - Support system-wide **color inversion** or **dark mode** options without losing usability or readability.
@@ -49,7 +55,8 @@ This checklist ensures compliance with WCAG 2.2 Level AA applied to native mobil
 
 ## Content Presentation
 
-- Hide non-visible content from the accessibility tree to avoid screen reader confusion; do not rely solely on opacity or z-index.
+- Hide non-visible content from the accessibility tree to avoid screen reader confusion; do not rely solely on opacity
+  or z-index.
 - Use containers and grouping widgets to create concise semantic navigation landmarks.
 - Apply live region announcements sparingly, only when relevant to user context changes.
 - Provide **captions and transcripts** for audio and video content.
@@ -61,7 +68,8 @@ This checklist ensures compliance with WCAG 2.2 Level AA applied to native mobil
 
 - Provide controls to **pause, stop, or hide animations** that can cause distractions or seizures.
 - Ensure non-text content has equivalent text alternatives (captions, transcripts).
-- Ensure non-text content which is pure decoration is ignored by assistive technology by wrapping it in an ExcludeSemantics widget
+- Ensure non-text content which is pure decoration is ignored by assistive technology by wrapping it in an
+  ExcludeSemantics widget
 - Avoid auto-playing audio or video without a user-initiated action.
 
 ---
@@ -74,4 +82,5 @@ This checklist ensures compliance with WCAG 2.2 Level AA applied to native mobil
 
 ---
 
-This checklist covers WCAG 2.2 mobile-specific success criteria including pointer gestures, draggable movements, label in name, and focus appearance to ensure your Flutter app is robustly accessible at AA level.
+This checklist covers WCAG 2.2 mobile-specific success criteria including pointer gestures, draggable movements, label
+in name, and focus appearance to ensure your Flutter app is robustly accessible at AA level.

@@ -21,12 +21,12 @@ internal class UserPreferencesStorage(context: Context) {
         PREFS_NAME,
         Context.MODE_PRIVATE
     )
-    
+
     companion object {
         private const val PREFS_NAME = "appero_prefs"
         private const val KEY_USER_ID = "appero_user_id"
     }
-    
+
     /**
      * Retrieves the stored user ID.
      * @return The user ID if it exists, null otherwise
@@ -34,7 +34,7 @@ internal class UserPreferencesStorage(context: Context) {
     fun getUserId(): String? {
         return prefs.getString(KEY_USER_ID, null)
     }
-    
+
     /**
      * Saves the user ID to SharedPreferences.
      * @param userId The user ID to save
@@ -42,7 +42,7 @@ internal class UserPreferencesStorage(context: Context) {
     fun saveUserId(userId: String) {
         prefs.edit { putString(KEY_USER_ID, userId) }
     }
-    
+
     /**
      * Removes the stored user ID.
      */
@@ -50,4 +50,3 @@ internal class UserPreferencesStorage(context: Context) {
         prefs.edit { remove(KEY_USER_ID) }
     }
 }
-

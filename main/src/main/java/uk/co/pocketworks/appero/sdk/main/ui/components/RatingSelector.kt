@@ -40,7 +40,7 @@ fun RatingSelector(
     selectedRating: ExperienceRating?,
     onRatingSelected: (ExperienceRating) -> Unit,
     modifier: Modifier = Modifier,
-    isReadOnly: Boolean = false
+    isReadOnly: Boolean = false,
 ) {
     val groupDescription = stringResource(R.string.appero_rating_group_label)
 

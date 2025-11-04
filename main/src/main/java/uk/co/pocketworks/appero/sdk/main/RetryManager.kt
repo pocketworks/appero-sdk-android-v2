@@ -26,6 +26,7 @@ import uk.co.pocketworks.appero.sdk.main.util.DateUtils
  * Internal class managing periodic retry of queued experiences and feedback.
  * Processes queues every 3 minutes when network connectivity is available.
  */
+@Suppress("LongParameterList")
 internal class RetryManager(
     private val storage: ApperoDataStorage,
     private val networkMonitor: NetworkMonitor,
@@ -33,11 +34,11 @@ internal class RetryManager(
     private val userId: String?,
     private val isDebug: Boolean,
     private val onDataUpdate: (uk.co.pocketworks.appero.sdk.main.model.ApperoData) -> Unit,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
 ) {
     private var retryJob: Job? = null
     private val retryIntervalMs = 180_000L // 3 minutes
-    
+
     /**
      * Starts the retry mechanism.
      * Will periodically attempt to process queued items.
@@ -46,24 +47,24 @@ internal class RetryManager(
         if (retryJob?.isActive == true) {
             return // Already running
         }
-        
+
         retryJob = scope.launch(Dispatchers.IO) {
             while (isActive) {
                 delay(retryIntervalMs)
-                
+
                 val isConnected = networkMonitor.isConnected.first()
                 if (!isConnected || networkMonitor.forceOfflineMode) {
                     ApperoLogger.log("No connectivity - skipping retry")
                     continue
                 }
-                
+
                 ApperoLogger.log("Attempting to send queued experiences/feedback")
                 processUnsentExperiences()
                 processUnsentFeedback()
             }
         }
     }
-    
+
     /**
      * Stops the retry mechanism.
      */
@@ -71,7 +72,7 @@ internal class RetryManager(
         retryJob?.cancel()
         retryJob = null
     }
-    
+
     /**
      * Processes queued experiences, attempting to send them to the API.
      */
@@ -80,18 +81,18 @@ internal class RetryManager(
             ApperoLogger.log("Cannot process experiences - API key or user ID not set")
             return
         }
-        
-        val currentData = storage.load(isDebug).getOrNull() ?: return
+
+        val currentData = storage.load().getOrNull() ?: return
         val queuedExperiences = currentData.unsentExperiences
-        
+
         if (queuedExperiences.isEmpty()) {
             return
         }
-        
+
         ApperoLogger.log("Processing ${queuedExperiences.size} unsent experiences")
-        
+
         val successfullyProcessed = mutableListOf<uk.co.pocketworks.appero.sdk.main.model.Experience>()
-        
+
         for ((index, experience) in queuedExperiences.withIndex()) {
             val experienceData = mapOf(
                 "client_id" to userId,
@@ -99,9 +100,9 @@ internal class RetryManager(
                 "value" to experience.value.value,
                 "context" to (experience.detail ?: ""),
                 "source" to "Android",
-                "build_version" to "n/a" // TODO: Get from BuildConfig if available
+                "build_version" to BuildConfig.SDK_VERSION
             )
-            
+
             val result = ApperoAPIClient.sendRequest(
                 endpoint = "experiences",
                 fields = experienceData,
@@ -109,7 +110,7 @@ internal class RetryManager(
                 authorization = apiKey,
                 isDebug = isDebug
             )
-            
+
             when {
                 result.isSuccess -> {
                     ApperoLogger.log("Experience posted successfully")
@@ -123,17 +124,17 @@ internal class RetryManager(
                 }
             }
         }
-        
+
         // Remove successfully processed experiences
         if (successfullyProcessed.isNotEmpty()) {
             val updatedData = currentData.copy(
                 unsentExperiences = queuedExperiences.filterNot { it in successfullyProcessed }
             )
-            storage.save(updatedData, isDebug)
+            storage.save(updatedData)
             onDataUpdate(updatedData)
         }
     }
-    
+
     /**
      * Processes queued feedback, attempting to send it to the API.
      */
@@ -142,18 +143,18 @@ internal class RetryManager(
             ApperoLogger.log("Cannot process feedback - API key or user ID not set")
             return
         }
-        
-        val currentData = storage.load(isDebug).getOrNull() ?: return
+
+        val currentData = storage.load().getOrNull() ?: return
         val queuedFeedback = currentData.unsentFeedback
-        
+
         if (queuedFeedback.isEmpty()) {
             return
         }
-        
+
         ApperoLogger.log("Processing ${queuedFeedback.size} unsent feedback items")
-        
+
         val successfullyProcessed = mutableListOf<uk.co.pocketworks.appero.sdk.main.model.QueuedFeedback>()
-        
+
         for ((index, feedback) in queuedFeedback.withIndex()) {
             val feedbackData = mapOf(
                 "client_id" to userId,
@@ -161,9 +162,9 @@ internal class RetryManager(
                 "rating" to feedback.rating.toString(),
                 "feedback" to (feedback.feedback ?: ""),
                 "source" to "Android",
-                "build_version" to "n/a" // TODO: Get from BuildConfig if available
+                "build_version" to BuildConfig.SDK_VERSION
             )
-            
+
             val result = ApperoAPIClient.sendRequest(
                 endpoint = "feedback",
                 fields = feedbackData,
@@ -171,7 +172,7 @@ internal class RetryManager(
                 authorization = apiKey,
                 isDebug = isDebug
             )
-            
+
             when {
                 result.isSuccess -> {
                     ApperoLogger.log("Feedback posted successfully")
@@ -185,15 +186,14 @@ internal class RetryManager(
                 }
             }
         }
-        
+
         // Remove successfully processed feedback
         if (successfullyProcessed.isNotEmpty()) {
             val updatedData = currentData.copy(
                 unsentFeedback = queuedFeedback.filterNot { it in successfullyProcessed }
             )
-            storage.save(updatedData, isDebug)
+            storage.save(updatedData)
             onDataUpdate(updatedData)
         }
     }
 }
-

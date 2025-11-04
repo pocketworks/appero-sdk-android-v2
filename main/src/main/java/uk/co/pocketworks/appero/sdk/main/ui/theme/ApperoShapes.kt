@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
  * Shape definitions for Appero SDK components.
  * Defines corner radii and border shapes for UI elements.
  */
+@Suppress("style:MagicNumber")
 data class ApperoShapes(
     /**
      * Small rounded corners for buttons and interactive elements.
@@ -41,5 +42,5 @@ data class ApperoShapes(
     /**
      * Fully rounded shape for circular elements (rating buttons).
      */
-    val circle: Shape = RoundedCornerShape(50)
+    val circle: Shape = RoundedCornerShape(50),
 )

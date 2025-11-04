@@ -42,7 +42,7 @@ import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
 import uk.co.pocketworks.appero.sdk.main.ui.components.FeedbackTextField
 import uk.co.pocketworks.appero.sdk.main.ui.components.RatingSelector
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoThemeProvider
-import uk.co.pocketworks.appero.sdk.main.ui.theme.LocalApperoTheme
+import uk.co.pocketworks.appero.sdk.main.ui.theme.LOCAL_APPERO_THEME
 
 /**
  * Feedback input screen.
@@ -83,9 +83,9 @@ fun FeedbackInputScreen(
     onSendFeedback: () -> Unit,
     isSubmitting: Boolean,
     onClose: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    val theme = LocalApperoTheme.current
+    val theme = LOCAL_APPERO_THEME.current
 
     Column(
         modifier = modifier

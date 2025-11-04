@@ -1,0 +1,170 @@
+//
+//  ApperoFeedbackBottomSheet.kt
+//  Appero SDK
+//
+//  MIT License
+//
+//  Copyright (c) 2024 Pocketworks Mobile
+//
+
+package uk.co.pocketworks.appero.sdk.main.ui
+
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.launch
+import uk.co.pocketworks.appero.sdk.main.Appero
+import uk.co.pocketworks.appero.sdk.main.R
+import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
+import uk.co.pocketworks.appero.sdk.main.ui.screens.FeedbackInputScreen
+import uk.co.pocketworks.appero.sdk.main.ui.screens.RatingSelectionScreen
+import uk.co.pocketworks.appero.sdk.main.ui.screens.ThankYouScreen
+import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoTheme
+import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoThemeProvider
+import uk.co.pocketworks.appero.sdk.main.ui.theme.DefaultApperoTheme
+
+/**
+ * Main feedback bottom sheet modal.
+ *
+ * Orchestrates the feedback collection flow:
+ * 1. Rating Selection Screen - User selects 1-5 rating
+ * 2. Feedback Input Screen - User provides optional text feedback
+ * 3. Thank You Screen - Confirmation after submission
+ *
+ * Observes StateFlows from Appero singleton:
+ * - shouldShowFeedbackPrompt: Controls visibility
+ * - feedbackUIStrings: Title, subtitle, placeholder text
+ * - flowType: Determines question (positive/negative)
+ *
+ * WCAG Compliance:
+ * - No focus traps (back button dismisses)
+ * - Modal announced to screen readers
+ * - Proper state management and transitions
+ *
+ * @param apperoInstance The Appero SDK instance (defaults to singleton)
+ * @param theme Custom theme (defaults to Material 3 adaptive theme)
+ * @param onDismiss Callback when modal is dismissed
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ApperoFeedbackBottomSheet(
+    apperoInstance: Appero = Appero.instance,
+    theme: ApperoTheme = DefaultApperoTheme,
+    onDismiss: () -> Unit = { apperoInstance.dismissApperoPrompt() }
+) {
+    // Observe StateFlows
+    val shouldShow by apperoInstance.shouldShowFeedbackPrompt.collectAsState()
+    val uiStrings by apperoInstance.feedbackUIStrings.collectAsState()
+    val flowType by apperoInstance.flowType.collectAsState()
+
+    // Internal state
+    var currentScreen by remember { mutableStateOf(Screen.Rating) }
+    var selectedRating by remember { mutableStateOf<ExperienceRating?>(null) }
+    var feedbackText by remember { mutableStateOf("") }
+    var isSubmitting by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+
+    // Determine question based on rating
+    val questionText = when {
+        selectedRating == null -> ""
+        selectedRating!!.value < 3 -> stringResource(R.string.appero_question_negative)
+        else -> stringResource(R.string.appero_question_positive)
+    }
+
+    if (shouldShow) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                // WCAG: Ensure focus returns properly on dismiss
+                onDismiss()
+                // Reset state for next time
+                currentScreen = Screen.Rating
+                selectedRating = null
+                feedbackText = ""
+                isSubmitting = false
+            },
+            sheetState = sheetState,
+            shape = DefaultApperoTheme.shapes.large
+        ) {
+            ApperoThemeProvider(theme = theme) {
+                when (currentScreen) {
+                    Screen.Rating -> RatingSelectionScreen(
+                        title = uiStrings.title,
+                        subtitle = uiStrings.subtitle,
+                        selectedRating = selectedRating,
+                        onRatingSelected = { rating ->
+                            selectedRating = rating
+                            apperoInstance.analyticsDelegate?.logRatingSelected(rating.value)
+                            // Navigate to feedback input
+                            currentScreen = Screen.FeedbackInput
+                        },
+                        onClose = onDismiss
+                    )
+
+                    Screen.FeedbackInput -> FeedbackInputScreen(
+                        title = uiStrings.title,
+                        subtitle = uiStrings.subtitle,
+                        selectedRating = selectedRating!!,
+                        question = questionText,
+                        feedbackText = feedbackText,
+                        onFeedbackTextChange = { feedbackText = it },
+                        isSubmitting = isSubmitting,
+                        onSendFeedback = {
+                            isSubmitting = true
+                            scope.launch {
+                                // Submit feedback to Appero
+                                apperoInstance.postFeedback(
+                                    rating = selectedRating!!,
+                                    feedback = feedbackText.ifBlank { null }
+                                )
+
+                                // Call analytics delegate
+                                apperoInstance.analyticsDelegate?.logApperoFeedback(
+                                    selectedRating!!.value,
+                                    feedbackText
+                                )
+
+                                isSubmitting = false
+                                // Navigate to thank you screen
+                                currentScreen = Screen.ThankYou
+                            }
+                        },
+                        onClose = onDismiss
+                    )
+
+                    Screen.ThankYou -> ThankYouScreen(
+                        onDone = {
+                            // Dismiss modal and reset state
+                            onDismiss()
+                            currentScreen = Screen.Rating
+                            selectedRating = null
+                            feedbackText = ""
+                        },
+                        onClose = onDismiss
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Internal enum for screen navigation.
+ */
+private enum class Screen {
+    Rating,
+    FeedbackInput,
+    ThankYou
+}

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rating 3: Neutral - Yellow face with straight mouth -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+
+    <!-- Circle background -->
+    <path
+        android:fillColor="#C99A1F"
+        android:pathData="M32,32m-30,0a30,30 0,1 1,60 0a30,30 0,1 1,-60 0"/>
+
+    <!-- Left eye -->
+    <circle
+        android:fillColor="#FFFFFF"
+        android:cx="23"
+        android:cy="25"
+        android:radius="3"/>
+
+    <!-- Right eye -->
+    <circle
+        android:fillColor="#FFFFFF"
+        android:cx="41"
+        android:cy="25"
+        android:radius="3"/>
+
+    <!-- Straight mouth -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M22,40 L42,40"/>
+</vector>

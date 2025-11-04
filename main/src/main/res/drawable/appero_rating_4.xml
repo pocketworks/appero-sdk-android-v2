@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rating 4: Satisfied - Light green smiling face -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+
+    <!-- Circle background -->
+    <path
+        android:fillColor="#4A9E4E"
+        android:pathData="M32,32m-30,0a30,30 0,1 1,60 0a30,30 0,1 1,-60 0"/>
+
+    <!-- Left eye -->
+    <circle
+        android:fillColor="#FFFFFF"
+        android:cx="23"
+        android:cy="25"
+        android:radius="3"/>
+
+    <!-- Right eye -->
+    <circle
+        android:fillColor="#FFFFFF"
+        android:cx="41"
+        android:cy="25"
+        android:radius="3"/>
+
+    <!-- Smile mouth -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M22,38 Q32,44 42,38"/>
+</vector>

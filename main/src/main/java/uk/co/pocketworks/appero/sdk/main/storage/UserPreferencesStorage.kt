@@ -11,11 +11,12 @@ package uk.co.pocketworks.appero.sdk.main.storage
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 /**
  * Internal class wrapping SharedPreferences for user ID storage.
  */
-internal class UserPreferences(context: Context) {
+internal class UserPreferencesStorage(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences(
         PREFS_NAME,
         Context.MODE_PRIVATE
@@ -39,14 +40,14 @@ internal class UserPreferences(context: Context) {
      * @param userId The user ID to save
      */
     fun saveUserId(userId: String) {
-        prefs.edit().putString(KEY_USER_ID, userId).apply()
+        prefs.edit { putString(KEY_USER_ID, userId) }
     }
     
     /**
      * Removes the stored user ID.
      */
     fun clearUserId() {
-        prefs.edit().remove(KEY_USER_ID).apply()
+        prefs.edit { remove(KEY_USER_ID) }
     }
 }
 

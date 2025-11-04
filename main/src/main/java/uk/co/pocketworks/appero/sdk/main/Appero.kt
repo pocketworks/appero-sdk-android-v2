@@ -10,20 +10,24 @@
 package uk.co.pocketworks.appero.sdk.main
 
 import android.content.Context
-import android.os.Build
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import java.util.UUID
 import uk.co.pocketworks.appero.sdk.main.analytics.IApperoAnalytics
-import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIError
 import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIClient
+import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIError
 import uk.co.pocketworks.appero.sdk.main.model.ApperoData
 import uk.co.pocketworks.appero.sdk.main.model.Experience
 import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
@@ -33,15 +37,20 @@ import uk.co.pocketworks.appero.sdk.main.model.FlowType
 import uk.co.pocketworks.appero.sdk.main.model.QueuedFeedback
 import uk.co.pocketworks.appero.sdk.main.network.NetworkMonitor
 import uk.co.pocketworks.appero.sdk.main.storage.ApperoDataStorage
-import uk.co.pocketworks.appero.sdk.main.storage.UserPreferences
-import uk.co.pocketworks.appero.sdk.main.util.ApperoDebug
+import uk.co.pocketworks.appero.sdk.main.storage.UserPreferencesStorage
+import uk.co.pocketworks.appero.sdk.main.util.ApperoLogger
+import uk.co.pocketworks.appero.sdk.main.util.DateUtils
+import java.util.UUID
 
 /**
  * Main singleton class for the Appero SDK.
- * 
+ *
  * Provides a shared instance that can be accessed from anywhere in your code once initialized.
  * We recommend initializing Appero in your Application class.
- * 
+ *
+ * The class is lifecycle-aware and will automatically clean up resources when the application
+ * is destroyed to prevent memory leaks.
+ *
  * Example usage:
  * ```
  * class MyApplication : Application() {
@@ -54,10 +63,10 @@ import uk.co.pocketworks.appero.sdk.main.util.ApperoDebug
  *         )
  *     }
  * }
- * 
+ *
  * // Log an experience
  * Appero.instance.log(ExperienceRating.STRONG_POSITIVE, "User completed purchase")
- * 
+ *
  * // Observe feedback prompt state
  * Appero.instance.shouldShowFeedbackPrompt.collect { shouldShow ->
  *     if (shouldShow) {
@@ -66,21 +75,26 @@ import uk.co.pocketworks.appero.sdk.main.util.ApperoDebug
  * }
  * ```
  */
-object Appero {
-    /**
-     * Shared singleton instance.
-     */
-    val instance: Appero = this
-    
-    /**
-     * Notification name constant for XML-based apps.
-     * Use this with NotificationCenter or similar to observe feedback prompt events.
-     */
-    const val kApperoFeedbackPromptNotification = "kApperoFeedbackPromptNotification"
-    
+class Appero private constructor() : LifecycleEventObserver {
+
+    companion object {
+        /**
+         * Shared singleton instance.
+         * Lazily initialized on first access.
+         */
+        val instance: Appero by lazy { Appero() }
+
+        /**
+         * Notification name constant for XML-based apps.
+         * Use this with NotificationCenter or similar to observe feedback prompt events.
+         */
+        const val APPERO_FEEDBACK_PROMPT_NOTIFICATION = "kApperoFeedbackPromptNotification"
+        const val APPERO_FEEDBACK_MAX_LENGTH = 240
+    }
+
     // Private configuration
     private var apiKey: String? = null
-    
+
     // Public properties
     /**
      * Optional user identifier (UUID from backend, account number, email address, etc.).
@@ -88,20 +102,17 @@ object Appero {
      */
     var userId: String? = null
         private set
-    
+
     /**
      * Set to true to enable debug logging to the console.
      */
-    var isDebug: Boolean = false
-        set(value) {
-            field = value
-        }
-    
+    private var debug: Boolean = false
+
     /**
      * Optional delegate for analytics integration.
      */
     var analyticsDelegate: IApperoAnalytics? = null
-    
+
     // Internal mutable StateFlows
     private val shouldShowFeedbackPromptState = MutableStateFlow(false)
     private val feedbackUIStringsState = MutableStateFlow(
@@ -112,72 +123,87 @@ object Appero {
         )
     )
     private val flowTypeState = MutableStateFlow(FlowType.NEUTRAL)
-    
+
     /**
      * Indicates whether the feedback UI should be shown.
      * Use this StateFlow in Compose or observe it to trigger UI presentation.
      */
     val shouldShowFeedbackPrompt: StateFlow<Boolean> = shouldShowFeedbackPromptState.asStateFlow()
-    
+
     /**
      * The UI strings for the feedback interface.
      * These can be customized via the Appero dashboard.
      */
     val feedbackUIStrings: StateFlow<FeedbackUIStrings> = feedbackUIStringsState.asStateFlow()
-    
+
     /**
      * The flow type to display in the feedback UI (positive/neutral/negative).
      */
     val flowType: StateFlow<FlowType> = flowTypeState.asStateFlow()
-    
+
     // Internal components
     private var networkMonitor: NetworkMonitor? = null
-    private var storage: ApperoDataStorage? = null
-    private var userPreferences: UserPreferences? = null
+    private var dataStorage: ApperoDataStorage? = null
+    private var userPreferencesStorage: UserPreferencesStorage? = null
     private var retryManager: RetryManager? = null
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-    
+    private var scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private var isLifecycleObserverRegistered = false
+
     // Internal state
     private val apperoDataState = MutableStateFlow<ApperoData?>(null)
-    
+
+    init {
+        // Register lifecycle observer when instance is created
+        registerLifecycleObserver()
+    }
+
     /**
      * Initializes the Appero SDK.
      * This should be called early in your app's lifecycle, typically in Application.onCreate().
-     * 
+     *
      * @param context Application context
      * @param apiKey Your Appero API key
      * @param userId Optional user identifier. If null, a UUID will be generated automatically.
+     * @param debug Set to true to enable debug logging to the console. Defaults to false
      */
-    fun start(context: Context, apiKey: String, userId: String? = null) {
+    fun start(context: Context, apiKey: String, userId: String? = null, debug: Boolean = false) {
+        ApperoLogger.init(debug)
+
         if (apiKey.isBlank()) {
-            ApperoDebug.log("API key cannot be empty", isDebug)
+            ApperoLogger.log("API key cannot be empty")
             return
         }
-        
+
+        // Recreate coroutine scope if it was cancelled during cleanup
+        if (!scope.isActive) {
+            scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        }
+
         this.apiKey = apiKey
+        this.debug = debug
         val applicationContext = context.applicationContext
-        
+
         // Initialize storage
-        userPreferences = UserPreferences(applicationContext)
-        storage = ApperoDataStorage(applicationContext)
-        
+        userPreferencesStorage = UserPreferencesStorage(applicationContext)
+        dataStorage = ApperoDataStorage(applicationContext)
+
         // Set or generate user ID
-        this.userId = userId ?: generateOrRestoreUserId(applicationContext)
-        
+        this.userId = userId ?: generateOrRestoreUserId()
+
         // Initialize network monitoring
         networkMonitor = NetworkMonitor(applicationContext).also {
             it.forceOfflineMode = false // Can be set externally for testing
         }
-        
+
         // Load existing ApperoData
-        val loadedData = storage?.load(isDebug)?.getOrNull() ?: ApperoData()
+        val loadedData = dataStorage?.load(debug)?.getOrNull() ?: ApperoData()
         apperoDataState.value = loadedData
-        
+
         // Update StateFlows with loaded data
         updateStateFlows(loadedData)
-        
+
         // Initialize retry manager
-        val storageInstance = storage
+        val storageInstance = dataStorage
         val networkMonitorInstance = networkMonitor
         if (storageInstance != null && networkMonitorInstance != null) {
             retryManager = RetryManager(
@@ -185,7 +211,7 @@ object Appero {
                 networkMonitor = networkMonitorInstance,
                 apiKey = apiKey,
                 userId = this.userId,
-                isDebug = isDebug,
+                isDebug = debug,
                 onDataUpdate = { data ->
                     apperoDataState.value = data
                     updateStateFlows(data)
@@ -193,252 +219,309 @@ object Appero {
                 scope = scope
             )
         }
-        
+
         retryManager?.start()
-        
-        ApperoDebug.log("Appero SDK initialized", isDebug)
+
+        ApperoLogger.log("Appero SDK initialized")
     }
-    
+
+    /**
+     * Registers this instance as a lifecycle observer to handle app lifecycle events.
+     */
+    private fun registerLifecycleObserver() {
+        if (!isLifecycleObserverRegistered) {
+            ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+            isLifecycleObserverRegistered = true
+        }
+    }
+
+    /**
+     * Lifecycle event observer callback.
+     * Handles cleanup when the application is destroyed.
+     */
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        when (event) {
+            Lifecycle.Event.ON_DESTROY -> {
+                cleanup()
+            }
+
+            else -> {
+                // Handle other lifecycle events if needed
+            }
+        }
+    }
+
+    /**
+     * Cleans up resources when the application is destroyed.
+     * This prevents memory leaks by releasing references and stopping background operations.
+     */
+    private fun cleanup() {
+        ApperoLogger.log("Cleaning up Appero SDK resources")
+
+        // Stop retry manager
+        retryManager?.stop()
+        retryManager = null
+
+        // Unregister network monitor
+        networkMonitor?.unregister()
+        networkMonitor = null
+
+        // Cancel coroutine scope
+        scope.cancel()
+
+        // Clear storage references (these don't hold Context, but we'll clear them anyway)
+        dataStorage = null
+        userPreferencesStorage = null
+
+        // Clear other references
+        apiKey = null
+        userId = null
+        analyticsDelegate = null
+
+        // Unregister lifecycle observer
+        if (isLifecycleObserverRegistered) {
+            ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
+            isLifecycleObserverRegistered = false
+        }
+
+        ApperoLogger.log("Appero SDK cleanup complete")
+    }
+
     /**
      * Generates a unique user ID or restores an existing one from SharedPreferences.
-     * 
-     * @param context Application context needed to access SharedPreferences
+     *
      * @return A unique user ID string
      */
-    private fun generateOrRestoreUserId(context: Context): String {
-        val prefs = UserPreferences(context)
-        val existingId = prefs.getUserId()
+    private fun generateOrRestoreUserId(): String {
+        val existingId = userPreferencesStorage?.getUserId()
         return if (existingId != null) {
             existingId
         } else {
             val newId = UUID.randomUUID().toString()
-            prefs.saveUserId(newId)
+            userPreferencesStorage?.saveUserId(newId)
             newId
         }
     }
-    
+
     /**
      * Logs a user experience.
-     * 
-     * @param experience The experience rating
-     * @param context Optional context string to categorize the experience
+     *
+     * @param rating The experience rating
+     * @param detail Optional context string to categorize the experience
      */
-    fun log(experience: ExperienceRating, context: String? = null) {
+    fun log(rating: ExperienceRating, detail: String? = null) {
         if (apiKey == null) {
-            ApperoDebug.log("Cannot log experience - SDK not initialized", isDebug)
+            ApperoLogger.log("Cannot log experience - SDK not initialized")
             return
         }
-        
+
         val experienceRecord = Experience(
-            date = java.time.Instant.now(),
-            value = experience,
-            context = context
+            date = System.currentTimeMillis(),
+            value = rating,
+            detail = detail
         )
-        
-        // Note: We can't pass context here as log() doesn't have it
-        // This is fine since storage is initialized during start()
+
         scope.launch(Dispatchers.IO) {
             postExperience(experienceRecord)
         }
     }
-    
+
     /**
      * Posts user feedback to Appero.
-     * 
-     * @param rating A value between 1 and 5 inclusive
-     * @param feedback Optional feedback text. Maximum length of 500 characters
+     *
+     * @param rating The experience rating
+     * @param feedback Optional feedback text
      * @return Result indicating success or failure
      */
-    suspend fun postFeedback(rating: Int, feedback: String?): Result<Boolean> {
-        // Validate rating
-        if (rating !in 1..5) {
-            ApperoDebug.log("Invalid rating: $rating (must be 1-5)", isDebug)
-            return Result.failure(IllegalArgumentException("Rating must be between 1 and 5"))
-        }
-        
+    suspend fun postFeedback(rating: ExperienceRating, feedback: String?): Result<Boolean> {
         // Validate feedback length
-        if (feedback != null && feedback.length > 500) {
-            ApperoDebug.log("Feedback exceeds maximum length: ${feedback.length} > 500", isDebug)
-            return Result.failure(IllegalArgumentException("Feedback cannot exceed 500 characters"))
+        if (feedback != null && feedback.length > APPERO_FEEDBACK_MAX_LENGTH) {
+            ApperoLogger.log("Feedback exceeds maximum length: ${feedback.length} > $APPERO_FEEDBACK_MAX_LENGTH")
+            return Result.failure(
+                IllegalArgumentException("Feedback cannot exceed $APPERO_FEEDBACK_MAX_LENGTH characters")
+            )
         }
-        
+
         val queuedFeedback = QueuedFeedback(
-            date = java.time.Instant.now(),
-            rating = rating,
+            date = System.currentTimeMillis(),
+            rating = rating.value,
             feedback = feedback
         )
-        
-        val isConnected = networkMonitor?.isConnected?.first() ?: false
-        
-        if (!isConnected || networkMonitor?.forceOfflineMode == true) {
-            ApperoDebug.log("No network connectivity - queuing feedback", isDebug)
-            queueFeedback(queuedFeedback, null) // Context not available in suspend function
-            return Result.success(true) // Return true since we've queued it
-        }
-        
-        if (apiKey == null) {
-            ApperoDebug.log("Cannot send feedback - API key not set", isDebug)
-            queueFeedback(queuedFeedback, null) // Context not available in suspend function
-            return Result.success(true)
-        }
-        
+
         val feedbackData = mapOf(
             "client_id" to (userId ?: ""),
-            "date" to queuedFeedback.date.toString(),
+            "date" to DateUtils.toIso8601String(queuedFeedback.date),
             "rating" to queuedFeedback.rating.toString(),
             "feedback" to (queuedFeedback.feedback ?: ""),
             "source" to "Android",
             "build_version" to "n/a"
         )
-        
-        val apiKeyValue = apiKey ?: run {
-            ApperoDebug.log("Cannot send feedback - API key not set", isDebug)
-            queueFeedback(queuedFeedback)
-            return Result.success(true)
-        }
-        
-        val result = ApperoAPIClient.sendRequest(
+
+        postToAPI(
             endpoint = "feedback",
-            fields = feedbackData,
-            method = ApperoAPIClient.HttpMethod.POST,
-            authorization = apiKeyValue,
-            isDebug = isDebug
+            requestData = feedbackData,
+            item = queuedFeedback,
+            queueAction = ::queueFeedback
         )
-        
-        return when {
-            result.isSuccess -> {
-                ApperoDebug.log("Feedback posted successfully", isDebug)
-                Result.success(true)
-            }
-            else -> {
-                ApperoDebug.log("Error submitting feedback - queuing for retry", isDebug)
-                queueFeedback(queuedFeedback, null) // Context not available in suspend function
-                Result.success(true) // Return true since we've queued it
-            }
-        }
+
+        // Always return success since queuing counts as success
+        return Result.success(true)
     }
-    
+
     /**
      * Dismisses the feedback prompt and prevents it from reappearing
      * until the server notifies us to show it again.
-     * 
-     * @param context Application context needed for persistence (optional if SDK initialized)
      */
-    fun dismissApperoPrompt(context: Context? = null) {
+    fun dismissApperoPrompt() {
         updateApperoData({ data ->
             data.copy(feedbackPromptShouldDisplay = false)
-        }, context)
+        })
     }
-    
+
     /**
      * Resets all local data (queued experiences, user ID, etc.).
      * You might use this when the user logs out or when testing your integration.
      */
-    fun reset(context: Context) {
+    fun reset() {
         // Clear user ID
-        UserPreferences(context).clearUserId()
-        
+        userPreferencesStorage?.clearUserId()
+
         // Clear ApperoData
-        ApperoDataStorage(context).clear(isDebug)
-        
+        dataStorage?.clear(debug)
+
         // Reset instance variables
         userId = null
         apperoDataState.value = ApperoData()
         updateStateFlows(ApperoData())
-        
-        ApperoDebug.log("Appero SDK reset", isDebug)
+
+        ApperoLogger.log("Appero SDK reset")
     }
-    
+
     // Private helper methods
-    
-    private suspend fun postExperience(experience: Experience, context: Context? = null) {
-        val apiKey = this.apiKey ?: run {
-            ApperoDebug.log("Cannot send experience - API key not set", isDebug)
-            queueExperience(experience, context)
-            return
-        }
-        
-        val userId = this.userId ?: run {
-            ApperoDebug.log("Cannot send experience - user ID not set", isDebug)
-            queueExperience(experience, context)
-            return
-        }
-        
+
+    /**
+     * Generic helper method for posting items to the Appero API.
+     * Handles network validation, API key checking, request execution, and error handling.
+     *
+     * @param endpoint The API endpoint name (e.g., "experiences", "feedback")
+     * @param requestData The request data map to send
+     * @param item The item being posted (for queuing on failure)
+     * @param queueAction Lambda to queue the item if posting fails
+     * @param onSuccess Optional lambda to handle successful response
+     */
+    private suspend fun <T> postToAPI(
+        endpoint: String,
+        requestData: Map<String, Any>,
+        item: T,
+        queueAction: (T) -> Unit,
+        onSuccess: suspend (ByteArray) -> Unit = {}
+    ) {
         val isConnected = networkMonitor?.isConnected?.first() ?: false
-        
+
         if (!isConnected || networkMonitor?.forceOfflineMode == true) {
-            ApperoDebug.log("No network connectivity - queuing experience", isDebug)
-            queueExperience(experience, context)
+            ApperoLogger.log("No network connectivity - queuing $endpoint")
+            queueAction(item)
             return
         }
-        
-        val experienceData = mapOf(
-            "client_id" to userId,
-            "sent_at" to experience.date.toString(),
-            "value" to experience.value.value,
-            "context" to (experience.context ?: ""),
-            "source" to "Android",
-            "build_version" to "n/a"
-        )
-        
+
+        val apiKeyValue = apiKey ?: run {
+            ApperoLogger.log("Cannot send $endpoint - API key not set")
+            queueAction(item)
+            return
+        }
+
         val result = ApperoAPIClient.sendRequest(
-            endpoint = "experiences",
-            fields = experienceData,
+            endpoint = endpoint,
+            fields = requestData,
             method = ApperoAPIClient.HttpMethod.POST,
-            authorization = apiKey,
-            isDebug = isDebug
+            authorization = apiKeyValue,
+            isDebug = debug
         )
-        
+
         when {
             result.isSuccess -> {
-                ApperoDebug.log("Experience posted successfully", isDebug)
-                try {
-                    val json = Json { ignoreUnknownKeys = true }
-                    val response = json.decodeFromString<ExperienceResponse>(result.getOrThrow().decodeToString())
-                    handleExperienceResponse(response)
-                } catch (e: Exception) {
-                    ApperoDebug.log("Failed to parse experience response: ${e.message}", isDebug)
-                }
+                ApperoLogger.log("${endpoint.replaceFirstChar { it.uppercase() }} posted successfully")
+                onSuccess(result.getOrThrow())
             }
+
             else -> {
                 val error = result.exceptionOrNull()
                 when (error) {
                     is ApperoAPIError.NetworkError -> {
-                        ApperoDebug.log("Network error ${error.statusCode} - queuing experience", isDebug)
+                        ApperoLogger.log("Network error ${error.statusCode} - queuing $endpoint")
                     }
+
                     is ApperoAPIError.ServerMessage -> {
-                        ApperoDebug.log("Server error - queuing experience: ${error.response?.description()}", isDebug)
+                        ApperoLogger.log("Server error - queuing $endpoint: ${error.response?.description()}")
                     }
+
                     else -> {
-                        ApperoDebug.log("Unknown error sending experience - queuing: ${error?.message}", isDebug)
+                        ApperoLogger.log("Unknown error sending $endpoint - queuing: ${error?.message}")
                     }
                 }
-                queueExperience(experience, context)
+                queueAction(item)
             }
         }
     }
-    
-    private fun queueExperience(experience: Experience, context: Context? = null) {
+
+    private suspend fun postExperience(experience: Experience) {
+        val userId = this.userId ?: run {
+            ApperoLogger.log("Cannot send experience - user ID not set")
+            queueExperience(experience)
+            return
+        }
+
+        val experienceData = mapOf(
+            "client_id" to userId,
+            "sent_at" to DateUtils.toIso8601String(experience.date),
+            "value" to experience.value.value,
+            "context" to (experience.detail ?: ""),
+            "source" to "Android",
+            "build_version" to "n/a"
+        )
+
+        postToAPI(
+            endpoint = "experiences",
+            requestData = experienceData,
+            item = experience,
+            queueAction = ::queueExperience,
+            onSuccess = { responseBytes ->
+                try {
+                    val json = Json { ignoreUnknownKeys = true }
+                    val response = json.decodeFromString<ExperienceResponse>(responseBytes.decodeToString())
+                    handleExperienceResponse(response)
+                } catch (e: Exception) {
+                    ApperoLogger.log("Failed to parse experience response: ${e.message}")
+                }
+            }
+        )
+    }
+
+    private fun queueExperience(experience: Experience) {
         updateApperoData({ data ->
             data.copy(
                 unsentExperiences = data.unsentExperiences + experience
             )
-        }, context)
-        ApperoDebug.log("Queued experience for retry. Total queued: ${(apperoDataState.value?.unsentExperiences?.size ?: 0) + 1}", isDebug)
+        })
+        ApperoLogger.log(
+            "Queued experience for retry. Total queued: ${(apperoDataState.value?.unsentExperiences?.size ?: 0) + 1}"
+        )
     }
-    
-    private fun queueFeedback(feedback: QueuedFeedback, context: Context? = null) {
+
+    private fun queueFeedback(feedback: QueuedFeedback) {
         updateApperoData({ data ->
             data.copy(
                 unsentFeedback = data.unsentFeedback + feedback
             )
-        }, context)
-        ApperoDebug.log("Queued feedback for retry. Total queued: ${(apperoDataState.value?.unsentFeedback?.size ?: 0) + 1}", isDebug)
+        })
+        ApperoLogger.log(
+            "Queued feedback for retry. Total queued: ${(apperoDataState.value?.unsentFeedback?.size ?: 0) + 1}"
+        )
     }
-    
+
     private fun handleExperienceResponse(response: ExperienceResponse) {
         val currentData = apperoDataState.value ?: ApperoData()
-        
+
         // Only update feedbackPromptShouldDisplay if it's currently false
         // This prevents subsequent responses from changing the value if we're already showing the UI
         val shouldShow = if (currentData.feedbackPromptShouldDisplay) {
@@ -446,33 +529,32 @@ object Appero {
         } else {
             response.shouldShowFeedbackUI
         }
-        
+
         val updatedData = currentData.copy(
             feedbackPromptShouldDisplay = shouldShow,
             feedbackUIStrings = response.feedbackUI ?: currentData.feedbackUIStrings,
             flowType = response.getFlowTypeEnum()
         )
-        
+
         updateApperoData { updatedData }
-        
+
         if (shouldShow) {
             // TODO: Post notification for XML-based apps if needed
         }
     }
-    
-    private fun updateApperoData(update: (ApperoData) -> ApperoData, context: Context? = null) {
+
+    private fun updateApperoData(update: (ApperoData) -> ApperoData) {
         val currentData = apperoDataState.value ?: ApperoData()
         val updatedData = update(currentData)
         apperoDataState.value = updatedData
-        
-        // Persist to storage if available
-        val storageInstance = storage ?: context?.let { ApperoDataStorage(it) }
-        storageInstance?.save(updatedData, isDebug)
-        
+
+        // Persist to storage
+        dataStorage?.save(updatedData, debug)
+
         // Update StateFlows
         updateStateFlows(updatedData)
     }
-    
+
     private fun updateStateFlows(data: ApperoData) {
         shouldShowFeedbackPromptState.value = data.feedbackPromptShouldDisplay
         feedbackUIStringsState.value = data.feedbackUIStrings

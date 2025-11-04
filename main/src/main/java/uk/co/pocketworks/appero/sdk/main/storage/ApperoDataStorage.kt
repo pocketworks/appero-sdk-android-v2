@@ -14,7 +14,8 @@ import android.content.SharedPreferences
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import uk.co.pocketworks.appero.sdk.main.model.ApperoData
-import uk.co.pocketworks.appero.sdk.main.util.ApperoDebug
+import uk.co.pocketworks.appero.sdk.main.util.ApperoLogger
+import androidx.core.content.edit
 
 /**
  * Internal class for storing and retrieving ApperoData as JSON string in SharedPreferences.
@@ -45,11 +46,11 @@ internal class ApperoDataStorage(context: Context) {
     fun save(data: ApperoData, isDebug: Boolean = false): Result<Unit> {
         return try {
             val jsonString = json.encodeToString(data)
-            prefs.edit().putString(KEY_APPERO_DATA, jsonString).apply()
-            ApperoDebug.log("Saved ApperoData successfully", isDebug)
+            prefs.edit { putString(KEY_APPERO_DATA, jsonString) }
+            ApperoLogger.log("Saved ApperoData successfully")
             Result.success(Unit)
         } catch (e: Exception) {
-            ApperoDebug.log("Error saving ApperoData: ${e.message}", isDebug)
+            ApperoLogger.log("Error saving ApperoData: ${e.message}")
             Result.failure(e)
         }
     }
@@ -64,15 +65,15 @@ internal class ApperoDataStorage(context: Context) {
             val jsonString = prefs.getString(KEY_APPERO_DATA, null)
             
             if (jsonString == null) {
-                ApperoDebug.log("No ApperoData found, returning default", isDebug)
+                ApperoLogger.log("No ApperoData found, returning default")
                 return Result.success(ApperoData())
             }
             
             val data = json.decodeFromString<ApperoData>(jsonString)
-            ApperoDebug.log("Loaded ApperoData successfully", isDebug)
+            ApperoLogger.log("Loaded ApperoData successfully")
             Result.success(data)
         } catch (e: Exception) {
-            ApperoDebug.log("Error loading ApperoData: ${e.message}, returning default", isDebug)
+            ApperoLogger.log("Error loading ApperoData: ${e.message}, returning default")
             // Return default data on error rather than failing
             Result.success(ApperoData())
         }
@@ -86,10 +87,10 @@ internal class ApperoDataStorage(context: Context) {
     fun clear(isDebug: Boolean = false): Result<Unit> {
         return try {
             prefs.edit().remove(KEY_APPERO_DATA).apply()
-            ApperoDebug.log("Cleared ApperoData successfully", isDebug)
+            ApperoLogger.log("Cleared ApperoData successfully")
             Result.success(Unit)
         } catch (e: Exception) {
-            ApperoDebug.log("Error clearing ApperoData: ${e.message}", isDebug)
+            ApperoLogger.log("Error clearing ApperoData: ${e.message}")
             Result.failure(e)
         }
     }

@@ -14,17 +14,27 @@ import android.util.Log
 /**
  * Internal utility for debug logging.
  */
-internal object ApperoDebug {
+internal object ApperoLogger {
     private const val TAG = "Appero"
-    
+
+    private var debug = false
+
+    /**
+     * Initializes the debug logging system.
+     *
+     * @param debug Whether debug logging is enabled
+     */
+    fun init(debug: Boolean) {
+        ApperoLogger.debug = debug
+    }
+
     /**
      * Logs a debug message with [Appero] prefix.
      * 
      * @param message The message to log
-     * @param isDebug Whether debug logging is enabled (typically from Appero.instance.isDebug)
      */
-    fun log(message: String, isDebug: Boolean) {
-        if (isDebug) {
+    fun log(message: String) {
+        if (debug) {
             Log.d(TAG, message)
         }
     }

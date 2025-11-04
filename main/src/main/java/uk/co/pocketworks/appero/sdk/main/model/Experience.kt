@@ -12,20 +12,19 @@ package uk.co.pocketworks.appero.sdk.main.model
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.time.Instant
 
 /**
  * Internal data class representing a logged user experience.
  * 
- * @property date Timestamp of when the experience occurred
+ * @property date Timestamp in milliseconds since epoch of when the experience occurred
  * @property value The experience rating
- * @property context Optional context string categorizing the experience
+ * @property detail Optional context string categorizing the experience
  */
 @Serializable
 internal data class Experience(
-    val date: @Serializable(with = InstantSerializer::class) Instant,
+    val date: @Serializable(with = InstantSerializer::class) Long,
     val value: ExperienceRating,
-    val context: String? = null
+    val detail: String? = null
 ) {
     companion object {
         /**

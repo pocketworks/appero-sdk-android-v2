@@ -12,7 +12,6 @@ package uk.co.pocketworks.appero.sdk.main
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
@@ -20,7 +19,8 @@ import kotlinx.coroutines.launch
 import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIClient
 import uk.co.pocketworks.appero.sdk.main.network.NetworkMonitor
 import uk.co.pocketworks.appero.sdk.main.storage.ApperoDataStorage
-import uk.co.pocketworks.appero.sdk.main.util.ApperoDebug
+import uk.co.pocketworks.appero.sdk.main.util.ApperoLogger
+import uk.co.pocketworks.appero.sdk.main.util.DateUtils
 
 /**
  * Internal class managing periodic retry of queued experiences and feedback.
@@ -53,11 +53,11 @@ internal class RetryManager(
                 
                 val isConnected = networkMonitor.isConnected.first()
                 if (!isConnected || networkMonitor.forceOfflineMode) {
-                    ApperoDebug.log("No connectivity - skipping retry", isDebug)
+                    ApperoLogger.log("No connectivity - skipping retry")
                     continue
                 }
                 
-                ApperoDebug.log("Attempting to send queued experiences/feedback", isDebug)
+                ApperoLogger.log("Attempting to send queued experiences/feedback")
                 processUnsentExperiences()
                 processUnsentFeedback()
             }
@@ -77,7 +77,7 @@ internal class RetryManager(
      */
     private suspend fun processUnsentExperiences() {
         if (apiKey == null || userId == null) {
-            ApperoDebug.log("Cannot process experiences - API key or user ID not set", isDebug)
+            ApperoLogger.log("Cannot process experiences - API key or user ID not set")
             return
         }
         
@@ -88,16 +88,16 @@ internal class RetryManager(
             return
         }
         
-        ApperoDebug.log("Processing ${queuedExperiences.size} unsent experiences", isDebug)
+        ApperoLogger.log("Processing ${queuedExperiences.size} unsent experiences")
         
         val successfullyProcessed = mutableListOf<uk.co.pocketworks.appero.sdk.main.model.Experience>()
         
         for ((index, experience) in queuedExperiences.withIndex()) {
             val experienceData = mapOf(
                 "client_id" to userId,
-                "sent_at" to experience.date.toString(),
+                "sent_at" to DateUtils.toIso8601String(experience.date),
                 "value" to experience.value.value,
-                "context" to (experience.context ?: ""),
+                "context" to (experience.detail ?: ""),
                 "source" to "Android",
                 "build_version" to "n/a" // TODO: Get from BuildConfig if available
             )
@@ -112,14 +112,13 @@ internal class RetryManager(
             
             when {
                 result.isSuccess -> {
-                    ApperoDebug.log("Experience posted successfully", isDebug)
+                    ApperoLogger.log("Experience posted successfully")
                     successfullyProcessed.add(experience)
                 }
                 else -> {
                     val error = result.exceptionOrNull()
-                    ApperoDebug.log(
-                        "Failed to send queued experience ${index + 1}/${queuedExperiences.size}: ${error?.message}",
-                        isDebug
+                    ApperoLogger.log(
+                        "Failed to send queued experience ${index + 1}/${queuedExperiences.size}: ${error?.message}"
                     )
                 }
             }
@@ -140,7 +139,7 @@ internal class RetryManager(
      */
     private suspend fun processUnsentFeedback() {
         if (apiKey == null || userId == null) {
-            ApperoDebug.log("Cannot process feedback - API key or user ID not set", isDebug)
+            ApperoLogger.log("Cannot process feedback - API key or user ID not set")
             return
         }
         
@@ -151,14 +150,14 @@ internal class RetryManager(
             return
         }
         
-        ApperoDebug.log("Processing ${queuedFeedback.size} unsent feedback items", isDebug)
+        ApperoLogger.log("Processing ${queuedFeedback.size} unsent feedback items")
         
         val successfullyProcessed = mutableListOf<uk.co.pocketworks.appero.sdk.main.model.QueuedFeedback>()
         
         for ((index, feedback) in queuedFeedback.withIndex()) {
             val feedbackData = mapOf(
                 "client_id" to userId,
-                "date" to feedback.date.toString(),
+                "date" to DateUtils.toIso8601String(feedback.date),
                 "rating" to feedback.rating.toString(),
                 "feedback" to (feedback.feedback ?: ""),
                 "source" to "Android",
@@ -175,14 +174,13 @@ internal class RetryManager(
             
             when {
                 result.isSuccess -> {
-                    ApperoDebug.log("Feedback posted successfully", isDebug)
+                    ApperoLogger.log("Feedback posted successfully")
                     successfullyProcessed.add(feedback)
                 }
                 else -> {
                     val error = result.exceptionOrNull()
-                    ApperoDebug.log(
-                        "Failed to send queued feedback ${index + 1}/${queuedFeedback.size}: ${error?.message}",
-                        isDebug
+                    ApperoLogger.log(
+                        "Failed to send queued feedback ${index + 1}/${queuedFeedback.size}: ${error?.message}"
                     )
                 }
             }

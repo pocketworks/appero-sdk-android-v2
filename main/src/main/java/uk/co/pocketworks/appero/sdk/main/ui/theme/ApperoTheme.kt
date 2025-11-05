@@ -47,9 +47,37 @@ interface ApperoTheme {
 }
 
 /**
+ * Light theme variant
+ */
+object LightApperoTheme : ApperoTheme {
+    override val colors: ApperoColors
+        get() = ApperoLightColors()
+
+    override val typography: ApperoTypography
+        get() = ApperoTypography()
+
+    override val shapes: ApperoShapes
+        get() = ApperoShapes()
+}
+
+/**
+ * Dark theme variant
+ */
+object DarkApperoTheme : ApperoTheme {
+    override val colors: ApperoColors
+        get() = ApperoDarkColors()
+
+    override val typography: ApperoTypography
+        get() = ApperoTypography()
+
+    override val shapes: ApperoShapes
+        get() = ApperoShapes()
+}
+
+/**
  * CompositionLocal for accessing the current Appero theme.
  * Use LocalApperoTheme.current to access theme values within composables.
  */
-val LOCAL_APPERO_THEME = staticCompositionLocalOf<ApperoTheme> {
-    DefaultApperoTheme
+val localApperoTheme = staticCompositionLocalOf<ApperoTheme> {
+    throw IllegalStateException("LocalApperoTheme not provided")
 }

@@ -14,8 +14,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -71,11 +71,11 @@ fun RatingButton(
 
     // Get drawable resource for this rating
     val iconRes = when (rating) {
-        ExperienceRating.STRONG_NEGATIVE -> R.drawable.appero_rating_1
-        ExperienceRating.NEGATIVE -> R.drawable.appero_rating_2
-        ExperienceRating.NEUTRAL -> R.drawable.appero_rating_3
-        ExperienceRating.POSITIVE -> R.drawable.appero_rating_4
-        ExperienceRating.STRONG_POSITIVE -> R.drawable.appero_rating_5
+        ExperienceRating.STRONG_NEGATIVE -> R.drawable.rating_1
+        ExperienceRating.NEGATIVE -> R.drawable.rating_2
+        ExperienceRating.NEUTRAL -> R.drawable.rating_3
+        ExperienceRating.POSITIVE -> R.drawable.rating_4
+        ExperienceRating.STRONG_POSITIVE -> R.drawable.rating_5
     }
 
     // Animate opacity transition
@@ -101,7 +101,7 @@ fun RatingButton(
             }
             .clickable(
                 onClick = onClick,
-                indication = rememberRipple(bounded = false, radius = 32.dp),
+                indication = ripple(bounded = false, radius = 32.dp),
                 interactionSource = remember { MutableInteractionSource() }
             )
             .scale(scale)

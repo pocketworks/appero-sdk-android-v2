@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.AbstractComposeView
 import uk.co.pocketworks.appero.sdk.main.Appero
 import uk.co.pocketworks.appero.sdk.main.ui.ApperoFeedbackUI
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoTheme
-import uk.co.pocketworks.appero.sdk.main.ui.theme.DefaultApperoTheme
 
 /**
  * Compose View wrapper for XML layouts.
@@ -70,7 +69,7 @@ class ApperoFeedbackComposeView @JvmOverloads constructor(
      * }
      * ```
      */
-    var theme: ApperoTheme = DefaultApperoTheme
+    var theme: ApperoTheme? = null
 
     /**
      * Optional custom Appero instance.
@@ -82,7 +81,7 @@ class ApperoFeedbackComposeView @JvmOverloads constructor(
     override fun Content() {
         ApperoFeedbackUI(
             apperoInstance = apperoInstance,
-            theme = theme
+            customTheme = theme
         )
     }
 }

@@ -35,7 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import uk.co.pocketworks.appero.sdk.main.R
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoThemeProvider
-import uk.co.pocketworks.appero.sdk.main.ui.theme.LOCAL_APPERO_THEME
+import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
 
 /**
  * Thank you confirmation screen.
@@ -62,7 +62,7 @@ fun ThankYouScreen(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val theme = LOCAL_APPERO_THEME.current
+    val theme = localApperoTheme.current
 
     Column(
         modifier = modifier

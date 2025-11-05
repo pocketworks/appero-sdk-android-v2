@@ -19,6 +19,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.invisibleToUser
@@ -29,7 +30,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import uk.co.pocketworks.appero.sdk.main.Appero
 import uk.co.pocketworks.appero.sdk.main.R
-import uk.co.pocketworks.appero.sdk.main.ui.theme.LOCAL_APPERO_THEME
+import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
 
 /**
  * WCAG-compliant feedback text input field.
@@ -48,15 +49,16 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.LOCAL_APPERO_THEME
  * @param maxLength Maximum number of characters allowed
  * @param modifier Optional modifier for customization
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FeedbackTextField(
+    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
     maxLength: Int = Appero.APPERO_FEEDBACK_MAX_LENGTH,
-    modifier: Modifier = Modifier,
 ) {
-    val theme = LOCAL_APPERO_THEME.current
+    val theme = localApperoTheme.current
     val characterCount = value.length
 
     // Create character counter text for accessibility and display

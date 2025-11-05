@@ -12,7 +12,6 @@ package uk.co.pocketworks.appero.sdk.main.ui
 import androidx.compose.runtime.Composable
 import uk.co.pocketworks.appero.sdk.main.Appero
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoTheme
-import uk.co.pocketworks.appero.sdk.main.ui.theme.DefaultApperoTheme
 
 /**
  * Top-level composable for Appero feedback UI.
@@ -55,10 +54,10 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.DefaultApperoTheme
 @Composable
 fun ApperoFeedbackUI(
     apperoInstance: Appero = Appero.instance,
-    theme: ApperoTheme = DefaultApperoTheme,
+    customTheme: ApperoTheme? = null,
 ) {
     ApperoFeedbackBottomSheet(
         apperoInstance = apperoInstance,
-        theme = theme
+        customTheme = customTheme
     )
 }

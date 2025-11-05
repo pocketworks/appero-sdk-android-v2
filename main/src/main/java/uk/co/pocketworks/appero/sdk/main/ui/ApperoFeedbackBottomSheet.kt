@@ -29,7 +29,7 @@ import uk.co.pocketworks.appero.sdk.main.ui.screens.RatingSelectionScreen
 import uk.co.pocketworks.appero.sdk.main.ui.screens.ThankYouScreen
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoTheme
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoThemeProvider
-import uk.co.pocketworks.appero.sdk.main.ui.theme.DefaultApperoTheme
+import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
 
 /**
  * Main feedback bottom sheet modal.
@@ -57,7 +57,7 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.DefaultApperoTheme
 @Composable
 fun ApperoFeedbackBottomSheet(
     apperoInstance: Appero = Appero.instance,
-    theme: ApperoTheme = DefaultApperoTheme,
+    customTheme: ApperoTheme? = null,
     onDismiss: () -> Unit = { apperoInstance.dismissApperoPrompt() },
 ) {
     // Observe StateFlows
@@ -84,20 +84,20 @@ fun ApperoFeedbackBottomSheet(
     }
 
     if (shouldShow) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                // WCAG: Ensure focus returns properly on dismiss
-                onDismiss()
-                // Reset state for next time
-                currentScreen = Screen.Rating
-                selectedRating = null
-                feedbackText = ""
-                isSubmitting = false
-            },
-            sheetState = sheetState,
-            shape = DefaultApperoTheme.shapes.large
-        ) {
-            ApperoThemeProvider(theme = theme) {
+        ApperoThemeProvider(customTheme) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    // WCAG: Ensure focus returns properly on dismiss
+                    onDismiss()
+                    // Reset state for next time
+                    currentScreen = Screen.Rating
+                    selectedRating = null
+                    feedbackText = ""
+                    isSubmitting = false
+                },
+                sheetState = sheetState,
+                shape = localApperoTheme.current.shapes.large
+            ) {
                 when (currentScreen) {
                     Screen.Rating -> RatingSelectionScreen(
                         title = uiStrings.title,

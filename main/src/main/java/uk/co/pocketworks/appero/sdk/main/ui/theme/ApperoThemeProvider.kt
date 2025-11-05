@@ -9,6 +9,7 @@
 
 package uk.co.pocketworks.appero.sdk.main.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 
@@ -16,7 +17,7 @@ import androidx.compose.runtime.CompositionLocalProvider
  * Provides Appero theme to composable content.
  *
  * Use this composable to apply a custom theme to the Appero feedback UI.
- * If no theme is provided, the default Material 3-based theme will be used.
+ * If no theme is provided, the default Appero Light or Dark mode themes will be used.
  *
  * Example usage:
  * ```kotlin
@@ -25,16 +26,21 @@ import androidx.compose.runtime.CompositionLocalProvider
  * }
  * ```
  *
- * @param theme The theme to apply (defaults to DefaultApperoTheme)
+ * @param customTheme The theme to apply
  * @param content The composable content to theme
  */
 @Composable
 fun ApperoThemeProvider(
-    theme: ApperoTheme = DefaultApperoTheme,
+    customTheme: ApperoTheme? = null,
     content: @Composable () -> Unit,
 ) {
+    val theme = customTheme ?: when (isSystemInDarkTheme()) {
+        true -> DarkApperoTheme
+        false -> LightApperoTheme
+    }
+
     CompositionLocalProvider(
-        LOCAL_APPERO_THEME provides theme,
+        localApperoTheme provides theme,
         content = content
     )
 }

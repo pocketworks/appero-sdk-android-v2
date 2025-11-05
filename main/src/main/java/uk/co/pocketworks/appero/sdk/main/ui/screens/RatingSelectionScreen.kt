@@ -32,7 +32,7 @@ import uk.co.pocketworks.appero.sdk.main.R
 import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
 import uk.co.pocketworks.appero.sdk.main.ui.components.RatingSelector
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoThemeProvider
-import uk.co.pocketworks.appero.sdk.main.ui.theme.LOCAL_APPERO_THEME
+import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
 
 /**
  * Initial rating selection screen.
@@ -64,7 +64,7 @@ fun RatingSelectionScreen(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val theme = LOCAL_APPERO_THEME.current
+    val theme = localApperoTheme.current
 
     Column(
         modifier = modifier

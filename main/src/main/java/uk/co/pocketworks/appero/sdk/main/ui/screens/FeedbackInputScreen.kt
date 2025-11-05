@@ -42,7 +42,7 @@ import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
 import uk.co.pocketworks.appero.sdk.main.ui.components.FeedbackTextField
 import uk.co.pocketworks.appero.sdk.main.ui.components.RatingSelector
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoThemeProvider
-import uk.co.pocketworks.appero.sdk.main.ui.theme.LOCAL_APPERO_THEME
+import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
 
 /**
  * Feedback input screen.
@@ -85,7 +85,7 @@ fun FeedbackInputScreen(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val theme = LOCAL_APPERO_THEME.current
+    val theme = localApperoTheme.current
 
     Column(
         modifier = modifier
@@ -156,6 +156,9 @@ fun FeedbackInputScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // Resolve string for accessibility announcement
+        val submittingText = stringResource(R.string.appero_submitting)
+
         // WCAG: Button with 48dp minimum height, loading state announced
         Button(
             onClick = onSendFeedback,
@@ -165,7 +168,7 @@ fun FeedbackInputScreen(
                 .heightIn(min = 48.dp) // WCAG: Minimum touch target height
                 .semantics {
                     if (isSubmitting) {
-                        stateDescription = stringResource(R.string.appero_submitting)
+                        stateDescription = submittingText
                     }
                 },
             colors = ButtonDefaults.buttonColors(

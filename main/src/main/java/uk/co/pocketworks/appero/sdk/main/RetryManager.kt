@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIClient
+import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIResponse
 import uk.co.pocketworks.appero.sdk.main.network.NetworkMonitor
 import uk.co.pocketworks.appero.sdk.main.storage.ApperoDataStorage
 import uk.co.pocketworks.appero.sdk.main.util.ApperoLogger
@@ -111,15 +112,14 @@ internal class RetryManager(
                 isDebug = isDebug
             )
 
-            when {
-                result.isSuccess -> {
+            when (result) {
+                is ApperoAPIResponse.Success -> {
                     ApperoLogger.log("Experience posted successfully")
                     successfullyProcessed.add(experience)
                 }
-                else -> {
-                    val error = result.exceptionOrNull()
+                is ApperoAPIResponse.Error -> {
                     ApperoLogger.log(
-                        "Failed to send queued experience ${index + 1}/${queuedExperiences.size}: ${error?.message}"
+                        "Failed to send queued experience ${index + 1}/${queuedExperiences.size}: ${result.error}"
                     )
                 }
             }
@@ -173,15 +173,14 @@ internal class RetryManager(
                 isDebug = isDebug
             )
 
-            when {
-                result.isSuccess -> {
+            when (result) {
+                is ApperoAPIResponse.Success -> {
                     ApperoLogger.log("Feedback posted successfully")
                     successfullyProcessed.add(feedback)
                 }
-                else -> {
-                    val error = result.exceptionOrNull()
+                is ApperoAPIResponse.Error -> {
                     ApperoLogger.log(
-                        "Failed to send queued feedback ${index + 1}/${queuedFeedback.size}: ${error?.message}"
+                        "Failed to send queued feedback ${index + 1}/${queuedFeedback.size}: ${result.error}"
                     )
                 }
             }

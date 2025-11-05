@@ -87,7 +87,7 @@ internal object ApperoAPIClient {
      * @param method The HTTP method to use
      * @param authorization The Bearer token for authentication
      * @param isDebug Whether debug logging is enabled
-     * @return Result containing the response body as ByteArray or an error
+     * @return ApperoAPIResponse containing either success data or error information
      */
     suspend fun sendRequest(
         endpoint: String,
@@ -95,7 +95,7 @@ internal object ApperoAPIClient {
         method: HttpMethod,
         authorization: String,
         isDebug: Boolean = false,
-    ): Result<ByteArray> {
+    ): ApperoAPIResponse {
         val client = createHttpClient(isDebug)
 
         return try {
@@ -138,7 +138,7 @@ internal object ApperoAPIClient {
             handleResponse(response)
         } catch (e: Exception) {
             ApperoLogger.log("Request failed with exception: ${e.message}")
-            Result.failure(ApperoAPIError.UnknownError(e))
+            ApperoAPIResponse.Error(ApperoAPIError.UnknownError(e))
         } finally {
             client.close()
         }
@@ -180,20 +180,20 @@ internal object ApperoAPIClient {
     }
 
     /**
-     * Handles the HTTP response and converts it to a Result.
+     * Handles the HTTP response and converts it to an ApperoAPIResponse.
      */
     private suspend fun handleResponse(
         response: HttpResponse,
-    ): Result<ByteArray> {
+    ): ApperoAPIResponse {
         return when {
             response.status.value in 200..204 -> {
                 try {
                     val body = response.body<ByteArray>()
                     ApperoLogger.log("Request successful with status ${response.status}")
-                    Result.success(body)
+                    ApperoAPIResponse.Success(body)
                 } catch (e: Exception) {
                     ApperoLogger.log("Failed to read response body: ${e.message}")
-                    Result.failure(ApperoAPIError.NoData)
+                    ApperoAPIResponse.Error(ApperoAPIError.NoData)
                 }
             }
             response.status == HttpStatusCode.Unauthorized ||
@@ -201,15 +201,15 @@ internal object ApperoAPIClient {
                 try {
                     val errorResponse: ApperoErrorResponse = response.body()
                     ApperoLogger.log("Server error: ${errorResponse.description()}")
-                    Result.failure(ApperoAPIError.ServerMessage(errorResponse))
+                    ApperoAPIResponse.Error(ApperoAPIError.ServerMessage(errorResponse))
                 } catch (e: Exception) {
                     ApperoLogger.log("Failed to parse error response: ${e.message}")
-                    Result.failure(ApperoAPIError.NetworkError(response.status.value))
+                    ApperoAPIResponse.Error(ApperoAPIError.NetworkError(response.status.value))
                 }
             }
             else -> {
                 ApperoLogger.log("Network error with status ${response.status.value}")
-                Result.failure(ApperoAPIError.NetworkError(response.status.value))
+                ApperoAPIResponse.Error(ApperoAPIError.NetworkError(response.status.value))
             }
         }
     }

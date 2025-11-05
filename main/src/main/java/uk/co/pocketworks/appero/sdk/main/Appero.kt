@@ -28,6 +28,7 @@ import kotlinx.serialization.json.Json
 import uk.co.pocketworks.appero.sdk.main.analytics.IApperoAnalytics
 import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIClient
 import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIError
+import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIResponse
 import uk.co.pocketworks.appero.sdk.main.model.ApperoData
 import uk.co.pocketworks.appero.sdk.main.model.Experience
 import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
@@ -354,7 +355,7 @@ class Appero private constructor() : LifecycleEventObserver {
             "rating" to queuedFeedback.rating.toString(),
             "feedback" to (queuedFeedback.feedback ?: ""),
             "source" to "Android",
-            "build_version" to "n/a"
+            "build_version" to BuildConfig.SDK_VERSION
         )
 
         postToAPI(
@@ -438,15 +439,14 @@ class Appero private constructor() : LifecycleEventObserver {
             isDebug = debug
         )
 
-        when {
-            result.isSuccess -> {
+        when (result) {
+            is ApperoAPIResponse.Success -> {
                 ApperoLogger.log("${endpoint.replaceFirstChar { it.uppercase() }} posted successfully")
-                onSuccess(result.getOrThrow())
+                onSuccess(result.data)
             }
 
-            else -> {
-                val error = result.exceptionOrNull()
-                when (error) {
+            is ApperoAPIResponse.Error -> {
+                when (val error = result.error) {
                     is ApperoAPIError.NetworkError -> {
                         ApperoLogger.log("Network error ${error.statusCode} - queuing $endpoint")
                     }
@@ -456,7 +456,7 @@ class Appero private constructor() : LifecycleEventObserver {
                     }
 
                     else -> {
-                        ApperoLogger.log("Unknown error sending $endpoint - queuing: ${error?.message}")
+                        ApperoLogger.log("Unknown error sending $endpoint - queuing: $error")
                     }
                 }
                 queueAction(item)
@@ -477,7 +477,7 @@ class Appero private constructor() : LifecycleEventObserver {
             "value" to experience.value.value,
             "context" to (experience.detail ?: ""),
             "source" to "Android",
-            "build_version" to "n/a"
+            "build_version" to BuildConfig.SDK_VERSION
         )
 
         postToAPI(

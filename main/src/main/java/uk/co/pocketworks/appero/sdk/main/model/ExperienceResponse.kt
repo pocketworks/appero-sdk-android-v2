@@ -25,7 +25,7 @@ internal data class ExperienceResponse(
     val shouldShowFeedbackUI: Boolean,
 
     @SerialName("flow_type")
-    val flowType: String, // API returns string, we'll convert to FlowType
+    val flowType: String,
 
     @SerialName("feedback_ui")
     val feedbackUI: FeedbackUIStrings? = null,

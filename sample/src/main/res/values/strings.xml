@@ -1,3 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Appero SDK Android</string>
+    <!-- App Name -->
+    <string name="app_name">Appero SDK Demo</string>
+
+    <!-- Theme Selector -->
+    <string name="theme_label">Appero UI theme:</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+
+    <!-- Rating Labels -->
+    <string name="rating_very_positive">Very Positive</string>
+    <string name="rating_positive">Positive</string>
+    <string name="rating_neutral">Neutral</string>
+    <string name="rating_negative">Negative</string>
+    <string name="rating_very_negative">Very Negative</string>
+
+    <!-- Actions -->
+    <string name="manually_trigger">Manually Trigger Feedback</string>
 </resources>

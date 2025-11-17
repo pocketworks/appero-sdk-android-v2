@@ -24,4 +24,8 @@ data class FeedbackUIStrings(
     val title: String,
     val subtitle: String,
     val prompt: String,
-)
+) {
+    companion object {
+        val default = FeedbackUIStrings("", "", "")
+    }
+}

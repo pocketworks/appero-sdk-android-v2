@@ -76,7 +76,7 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
 fun FeedbackInputScreen(
     title: String,
     subtitle: String,
-    selectedRating: ExperienceRating,
+    selectedRating: ExperienceRating?,
     question: String,
     feedbackText: String,
     onFeedbackTextChange: (String) -> Unit,
@@ -151,7 +151,7 @@ fun FeedbackInputScreen(
         FeedbackTextField(
             value = feedbackText,
             onValueChange = onFeedbackTextChange,
-            placeholder = stringResource(R.string.appero_feedback_placeholder)
+            placeholder = stringResource(R.string.default_ui_prompt)
         )
 
         Spacer(modifier = Modifier.height(24.dp))

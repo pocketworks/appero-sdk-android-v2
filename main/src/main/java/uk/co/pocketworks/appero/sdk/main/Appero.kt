@@ -116,13 +116,8 @@ class Appero private constructor() : LifecycleEventObserver {
 
     // Internal mutable StateFlows
     private val shouldShowFeedbackPromptState = MutableStateFlow(false)
-    private val feedbackUIStringsState = MutableStateFlow(
-        FeedbackUIStrings(
-            title = "Thanks for using our app!",
-            subtitle = "Please let us know how we're doing",
-            prompt = "Share your thoughts here"
-        )
-    )
+    private var defaultUiStrings = FeedbackUIStrings.default
+    private val feedbackUIStringsState = MutableStateFlow(defaultUiStrings)
     private val flowTypeState = MutableStateFlow(FlowType.NEUTRAL)
 
     /**
@@ -183,6 +178,13 @@ class Appero private constructor() : LifecycleEventObserver {
         this.apiKey = apiKey
         this.debug = debug
         val applicationContext = context.applicationContext
+
+        defaultUiStrings = FeedbackUIStrings(
+            title = context.getString(R.string.default_ui_title),
+            subtitle = context.getString(R.string.default_ui_subtitle),
+            prompt = context.getString(R.string.default_ui_prompt)
+        )
+        feedbackUIStringsState.value = defaultUiStrings
 
         // Initialize storage
         userPreferencesStorage = UserPreferencesStorage(applicationContext)
@@ -400,6 +402,39 @@ class Appero private constructor() : LifecycleEventObserver {
 
     // Private helper methods
 
+    private suspend fun postExperience(experience: Experience) {
+        val userId = this.userId ?: run {
+            ApperoLogger.log("Cannot send experience - user ID not set")
+            queueExperience(experience)
+            return
+        }
+
+        val experienceData = mapOf(
+            "client_id" to userId,
+            "sent_at" to DateUtils.toIso8601String(experience.date),
+            "value" to experience.value.value,
+            "context" to (experience.detail ?: ""),
+            "source" to "Android",
+            "build_version" to BuildConfig.SDK_VERSION
+        )
+
+        postToAPI(
+            endpoint = "experiences",
+            requestData = experienceData,
+            item = experience,
+            queueAction = ::queueExperience,
+            onSuccess = { responseBytes ->
+                try {
+                    val json = Json { ignoreUnknownKeys = true }
+                    val response = json.decodeFromString<ExperienceResponse>(responseBytes.decodeToString())
+                    handleExperienceResponse(response)
+                } catch (e: Exception) {
+                    ApperoLogger.log("Failed to parse experience response: ${e.message}")
+                }
+            }
+        )
+    }
+
     /**
      * Generic helper method for posting items to the Appero API.
      * Handles network validation, API key checking, request execution, and error handling.
@@ -464,39 +499,6 @@ class Appero private constructor() : LifecycleEventObserver {
         }
     }
 
-    private suspend fun postExperience(experience: Experience) {
-        val userId = this.userId ?: run {
-            ApperoLogger.log("Cannot send experience - user ID not set")
-            queueExperience(experience)
-            return
-        }
-
-        val experienceData = mapOf(
-            "client_id" to userId,
-            "sent_at" to DateUtils.toIso8601String(experience.date),
-            "value" to experience.value.value,
-            "context" to (experience.detail ?: ""),
-            "source" to "Android",
-            "build_version" to BuildConfig.SDK_VERSION
-        )
-
-        postToAPI(
-            endpoint = "experiences",
-            requestData = experienceData,
-            item = experience,
-            queueAction = ::queueExperience,
-            onSuccess = { responseBytes ->
-                try {
-                    val json = Json { ignoreUnknownKeys = true }
-                    val response = json.decodeFromString<ExperienceResponse>(responseBytes.decodeToString())
-                    handleExperienceResponse(response)
-                } catch (e: Exception) {
-                    ApperoLogger.log("Failed to parse experience response: ${e.message}")
-                }
-            }
-        )
-    }
-
     private fun queueExperience(experience: Experience) {
         updateApperoData({ data ->
             data.copy(
@@ -525,7 +527,7 @@ class Appero private constructor() : LifecycleEventObserver {
         // Only update feedbackPromptShouldDisplay if it's currently false
         // This prevents subsequent responses from changing the value if we're already showing the UI
         val shouldShow = if (currentData.feedbackPromptShouldDisplay) {
-            currentData.feedbackPromptShouldDisplay
+            true
         } else {
             response.shouldShowFeedbackUI
         }
@@ -558,7 +560,7 @@ class Appero private constructor() : LifecycleEventObserver {
 
     private fun updateStateFlows(data: ApperoData) {
         shouldShowFeedbackPromptState.value = data.feedbackPromptShouldDisplay
-        feedbackUIStringsState.value = data.feedbackUIStrings
+        feedbackUIStringsState.value = data.feedbackUIStrings ?: defaultUiStrings
         flowTypeState.value = data.flowType
     }
 }

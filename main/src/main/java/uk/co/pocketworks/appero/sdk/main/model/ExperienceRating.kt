@@ -15,6 +15,7 @@ import kotlinx.serialization.Serializable
  * Represents user experience ratings on a 5-point scale.
  * Higher values indicate more positive experiences.
  */
+@Suppress("detekt:MagicNumber")
 @Serializable
 enum class ExperienceRating(val value: Int) {
     /** Strongly positive user experience (rating: 5) */

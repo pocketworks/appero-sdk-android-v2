@@ -4,7 +4,11 @@
     <string name="appero_close">Close feedback</string>
     <string name="appero_send_feedback">Send feedback</string>
     <string name="appero_done">Done</string>
-    <string name="appero_feedback_placeholder">Share your thoughts here</string>
+
+    <!-- Default UI strings -->
+    <string name="default_ui_title">Thanks for using our app!</string>
+    <string name="default_ui_subtitle">Please let us know how we're doing</string>
+    <string name="default_ui_prompt">Share your thoughts here</string>
 
     <!-- Flow-specific questions -->
     <string name="appero_question_positive">What made your experience positive?</string>

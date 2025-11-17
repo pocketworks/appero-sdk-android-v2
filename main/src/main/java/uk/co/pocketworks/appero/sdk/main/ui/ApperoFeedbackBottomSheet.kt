@@ -50,7 +50,7 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
  * - Proper state management and transitions
  *
  * @param apperoInstance The Appero SDK instance (defaults to singleton)
- * @param theme Custom theme (defaults to Material 3 adaptive theme)
+ * @param customTheme Custom theme (defaults to Material 3 adaptive theme)
  * @param onDismiss Callback when modal is dismissed
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,11 +77,13 @@ fun ApperoFeedbackBottomSheet(
     )
 
     // Determine question based on rating
-    val questionText = when {
-        selectedRating == null -> ""
-        selectedRating!!.value < 3 -> stringResource(R.string.appero_question_negative)
-        else -> stringResource(R.string.appero_question_positive)
-    }
+    val questionText = selectedRating?.let { rating ->
+        if (rating < ExperienceRating.NEUTRAL) {
+            stringResource(R.string.appero_question_negative)
+        } else {
+            stringResource(R.string.appero_question_positive)
+        }
+    } ?: ""
 
     if (shouldShow) {
         ApperoThemeProvider(customTheme) {
@@ -115,7 +117,7 @@ fun ApperoFeedbackBottomSheet(
                     Screen.FeedbackInput -> FeedbackInputScreen(
                         title = uiStrings.title,
                         subtitle = uiStrings.subtitle,
-                        selectedRating = selectedRating!!,
+                        selectedRating = selectedRating,
                         question = questionText,
                         feedbackText = feedbackText,
                         onFeedbackTextChange = { feedbackText = it },
@@ -124,20 +126,22 @@ fun ApperoFeedbackBottomSheet(
                             isSubmitting = true
                             scope.launch {
                                 // Submit feedback to Appero
-                                apperoInstance.postFeedback(
-                                    rating = selectedRating!!,
-                                    feedback = feedbackText.ifBlank { null }
-                                )
+                                selectedRating?.let { rating ->
+                                    apperoInstance.postFeedback(
+                                        rating = rating,
+                                        feedback = feedbackText.ifBlank { null }
+                                    )
 
-                                // Call analytics delegate
-                                apperoInstance.analyticsDelegate?.logApperoFeedback(
-                                    selectedRating!!.value,
-                                    feedbackText
-                                )
+                                    // Call analytics delegate
+                                    apperoInstance.analyticsDelegate?.logApperoFeedback(
+                                        rating.value,
+                                        feedbackText
+                                    )
 
-                                isSubmitting = false
-                                // Navigate to thank you screen
-                                currentScreen = Screen.ThankYou
+                                    isSubmitting = false
+                                    // Navigate to thank you screen
+                                    currentScreen = Screen.ThankYou
+                                }
                             }
                         },
                         onClose = onDismiss

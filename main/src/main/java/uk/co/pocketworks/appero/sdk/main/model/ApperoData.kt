@@ -28,11 +28,7 @@ internal data class ApperoData(
     val unsentExperiences: List<Experience> = emptyList(),
     val unsentFeedback: List<QueuedFeedback> = emptyList(),
     val feedbackPromptShouldDisplay: Boolean = false,
-    val feedbackUIStrings: FeedbackUIStrings = FeedbackUIStrings(
-        title = "Thanks for using our app!",
-        subtitle = "Please let us know how we're doing",
-        prompt = "Share your thoughts here"
-    ),
+    val feedbackUIStrings: FeedbackUIStrings? = null,
     val lastPromptDate: @Serializable(with = InstantSerializer::class) Long? = null,
     val flowType: FlowType = FlowType.NEUTRAL,
 )

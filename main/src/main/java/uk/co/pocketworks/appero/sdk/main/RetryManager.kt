@@ -18,6 +18,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIClient
 import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIResponse
+import uk.co.pocketworks.appero.sdk.main.model.Experience
+import uk.co.pocketworks.appero.sdk.main.model.QueuedFeedback
 import uk.co.pocketworks.appero.sdk.main.network.NetworkMonitor
 import uk.co.pocketworks.appero.sdk.main.storage.ApperoDataStorage
 import uk.co.pocketworks.appero.sdk.main.util.ApperoLogger
@@ -92,7 +94,7 @@ internal class RetryManager(
 
         ApperoLogger.log("Processing ${queuedExperiences.size} unsent experiences")
 
-        val successfullyProcessed = mutableListOf<uk.co.pocketworks.appero.sdk.main.model.Experience>()
+        val successfullyProcessed = mutableListOf<Experience>()
 
         for ((index, experience) in queuedExperiences.withIndex()) {
             val experienceData = mapOf(
@@ -153,7 +155,7 @@ internal class RetryManager(
 
         ApperoLogger.log("Processing ${queuedFeedback.size} unsent feedback items")
 
-        val successfullyProcessed = mutableListOf<uk.co.pocketworks.appero.sdk.main.model.QueuedFeedback>()
+        val successfullyProcessed = mutableListOf<QueuedFeedback>()
 
         for ((index, feedback) in queuedFeedback.withIndex()) {
             val feedbackData = mapOf(

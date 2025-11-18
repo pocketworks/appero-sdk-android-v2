@@ -17,15 +17,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,7 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import uk.co.pocketworks.appero.sdk.main.R
@@ -69,7 +63,6 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
  * @param onFeedbackTextChange Callback when feedback text changes
  * @param onSendFeedback Callback when send button is tapped
  * @param isSubmitting Whether feedback is currently being submitted
- * @param onClose Callback when close button is tapped
  * @param modifier Optional modifier
  */
 @Composable
@@ -80,69 +73,54 @@ fun FeedbackInputScreen(
     question: String,
     feedbackText: String,
     onFeedbackTextChange: (String) -> Unit,
+    onRatingSelected: (ExperienceRating) -> Unit,
     onSendFeedback: () -> Unit,
     isSubmitting: Boolean,
-    onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val theme = localApperoTheme.current
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState()) // WCAG: Scrollable for text scaling
-            .padding(24.dp)
+        modifier = modifier.fillMaxWidth()
     ) {
-        // Close button
-        IconButton(
-            onClick = onClose,
-            modifier = Modifier
-                .align(Alignment.End)
-                .size(48.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = stringResource(R.string.appero_close),
-                tint = theme.colors.onSurface
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
         // Title
         Text(
             text = title,
             style = theme.typography.titleLarge,
             color = theme.colors.onSurface,
-            modifier = Modifier.semantics { heading() }
+            textAlign = TextAlign.Center,
+            modifier = Modifier.semantics { heading() }.align(Alignment.CenterHorizontally)
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Subtitle
         Text(
             text = subtitle,
             style = theme.typography.bodyMedium,
-            color = theme.colors.onSurfaceVariant
+            color = theme.colors.onSurfaceVariant,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+
 
         // Show selected rating (read-only)
         RatingSelector(
             selectedRating = selectedRating,
-            onRatingSelected = {}, // Read-only, no action
+            onRatingSelected = onRatingSelected,
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            isReadOnly = true
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Dynamic question
         Text(
             text = question,
-            style = theme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-            color = theme.colors.onSurface
+            style = theme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            color = theme.colors.onSurfaceVariant,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -175,7 +153,7 @@ fun FeedbackInputScreen(
                 containerColor = theme.colors.primary,
                 contentColor = theme.colors.onPrimary
             ),
-            shape = theme.shapes.small
+            shape = theme.shapes.medium
         ) {
             if (isSubmitting) {
                 CircularProgressIndicator(
@@ -204,9 +182,9 @@ private fun FeedbackInputScreenPositivePreview() {
             question = "What made your experience positive?",
             feedbackText = "",
             onFeedbackTextChange = {},
+            onRatingSelected = {},
             onSendFeedback = {},
             isSubmitting = false,
-            onClose = {}
         )
     }
 }
@@ -222,9 +200,9 @@ private fun FeedbackInputScreenNegativePreview() {
             question = "We're sorry you're not enjoying it. Could you tell us what went wrong?",
             feedbackText = "The search feature is not working properly.",
             onFeedbackTextChange = {},
+            onRatingSelected = {},
             onSendFeedback = {},
             isSubmitting = false,
-            onClose = {}
         )
     }
 }
@@ -241,8 +219,8 @@ private fun FeedbackInputScreenLoadingPreview() {
             feedbackText = "Love the barcode scanner feature!",
             onFeedbackTextChange = {},
             onSendFeedback = {},
+            onRatingSelected = {},
             isSubmitting = true,
-            onClose = {}
         )
     }
 }

@@ -18,18 +18,18 @@ import kotlinx.serialization.Serializable
 @Suppress("detekt:MagicNumber")
 @Serializable
 enum class ExperienceRating(val value: Int) {
-    /** Strongly positive user experience (rating: 5) */
-    STRONG_POSITIVE(5),
-
-    /** Positive user experience (rating: 4) */
-    POSITIVE(4),
-
-    /** Neutral user experience (rating: 3) */
-    NEUTRAL(3),
+    /** Strongly negative user experience (rating: 1) */
+    STRONG_NEGATIVE(1),
 
     /** Negative user experience (rating: 2) */
     NEGATIVE(2),
 
-    /** Strongly negative user experience (rating: 1) */
-    STRONG_NEGATIVE(1),
+    /** Neutral user experience (rating: 3) */
+    NEUTRAL(3),
+
+    /** Positive user experience (rating: 4) */
+    POSITIVE(4),
+
+    /** Strongly positive user experience (rating: 5) */
+    STRONG_POSITIVE(5),
 }

@@ -10,7 +10,11 @@
 package uk.co.pocketworks.appero.sdk.main.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,20 +53,22 @@ fun RatingSelector(
             // WCAG: Announce group purpose to screen readers
             contentDescription = groupDescription
         },
-        horizontalArrangement = Arrangement.spacedBy(16.dp), // WCAG: Adequate spacing
+        horizontalArrangement = Arrangement.SpaceEvenly, // WCAG: Adequate spacing
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Display all 5 rating options
         ExperienceRating.entries.forEach { rating ->
-            RatingButton(
-                rating = rating,
-                isSelected = selectedRating == rating,
-                onClick = {
-                    if (!isReadOnly) {
-                        onRatingSelected(rating)
+            Box(modifier = Modifier.padding(all = 8.dp).height(56.dp).width(56.dp)) {
+                RatingButton(
+                    rating = rating,
+                    isSelected = selectedRating == rating,
+                    onClick = {
+                        if (!isReadOnly) {
+                            onRatingSelected(rating)
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     }
 }

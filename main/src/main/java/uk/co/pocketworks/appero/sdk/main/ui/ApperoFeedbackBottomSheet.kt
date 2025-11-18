@@ -9,6 +9,7 @@
 
 package uk.co.pocketworks.appero.sdk.main.ui
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -19,7 +20,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import uk.co.pocketworks.appero.sdk.main.Appero
 import uk.co.pocketworks.appero.sdk.main.R
@@ -102,6 +105,7 @@ fun ApperoFeedbackBottomSheet(
             ) {
                 when (currentScreen) {
                     Screen.Rating -> RatingSelectionScreen(
+                        modifier = Modifier.padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 32.dp),
                         title = uiStrings.title,
                         subtitle = uiStrings.subtitle,
                         selectedRating = selectedRating,
@@ -110,11 +114,11 @@ fun ApperoFeedbackBottomSheet(
                             apperoInstance.analyticsDelegate?.logRatingSelected(rating.value)
                             // Navigate to feedback input
                             currentScreen = Screen.FeedbackInput
-                        },
-                        onClose = onDismiss
+                        }
                     )
 
                     Screen.FeedbackInput -> FeedbackInputScreen(
+                        modifier = Modifier.padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 32.dp),
                         title = uiStrings.title,
                         subtitle = uiStrings.subtitle,
                         selectedRating = selectedRating,
@@ -122,6 +126,10 @@ fun ApperoFeedbackBottomSheet(
                         feedbackText = feedbackText,
                         onFeedbackTextChange = { feedbackText = it },
                         isSubmitting = isSubmitting,
+                        onRatingSelected = { rating ->
+                            selectedRating = rating
+                            apperoInstance.analyticsDelegate?.logRatingSelected(rating.value)
+                        },
                         onSendFeedback = {
                             isSubmitting = true
                             scope.launch {
@@ -144,10 +152,10 @@ fun ApperoFeedbackBottomSheet(
                                 }
                             }
                         },
-                        onClose = onDismiss
                     )
 
                     Screen.ThankYou -> ThankYouScreen(
+                        modifier = Modifier.padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 32.dp),
                         onDone = {
                             // Dismiss modal and reset state
                             onDismiss()
@@ -155,9 +163,9 @@ fun ApperoFeedbackBottomSheet(
                             selectedRating = null
                             feedbackText = ""
                         },
-                        onClose = onDismiss
                     )
                 }
+
             }
         }
     }

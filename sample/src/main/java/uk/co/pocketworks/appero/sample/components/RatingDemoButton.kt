@@ -40,15 +40,13 @@ import androidx.compose.ui.unit.sp
  * @param label The rating label text (e.g., "Very Positive")
  * @param iconRes The drawable resource ID for the rating icon
  * @param backgroundColor The background color of the button
- * @param textColor The text color (defaults to appropriate contrast)
  * @param onClick Callback when button is clicked
  */
 @Composable
 fun RatingDemoButton(
     label: String,
-    iconRes: Int,
+    iconRes: Int?,
     backgroundColor: Color,
-    textColor: Color = Color(0xFF007AFF), // iOS blue
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -59,7 +57,7 @@ fun RatingDemoButton(
             .height(60.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor,
-            contentColor = textColor
+            contentColor = Color(0xFF007AFF)
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -68,17 +66,19 @@ fun RatingDemoButton(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                painter = painterResource(id = iconRes),
-                contentDescription = label,
-                tint = textColor,
-                modifier = Modifier.padding(end = 8.dp)
-            )
+            if (iconRes != null) {
+                Icon(
+                    painter = painterResource(id = iconRes),
+                    contentDescription = label,
+                    tint = Color(0xFF007AFF),
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+            }
             Text(
                 text = label,
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Normal,
-                color = textColor
+                color = Color(0xFF007AFF)
             )
         }
     }

@@ -382,6 +382,15 @@ class Appero private constructor() : LifecycleEventObserver {
     }
 
     /**
+     * Used for testing purposes only. It's the back-end which notifies when to show the feedback prompt.
+     */
+    fun triggerShowFeedbackPrompt() {
+        updateApperoData({ data ->
+            data.copy(feedbackPromptShouldDisplay = true)
+        })
+    }
+
+    /**
      * Resets all local data (queued experiences, user ID, etc.).
      * You might use this when the user logs out or when testing your integration.
      */

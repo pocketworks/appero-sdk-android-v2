@@ -7,7 +7,7 @@
 
     <!-- Default UI strings -->
     <string name="default_ui_title">Thanks for using our app!</string>
-    <string name="default_ui_subtitle">Please let us know how we're doing</string>
+    <string name="default_ui_subtitle">Please let us know how we\'re doing</string>
     <string name="default_ui_prompt">Share your thoughts here</string>
 
     <!-- Flow-specific questions -->

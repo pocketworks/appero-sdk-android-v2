@@ -13,12 +13,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -42,7 +40,6 @@ import uk.co.pocketworks.appero.sample.components.RatingDemoButton
 import uk.co.pocketworks.appero.sample.components.ThemeMode
 import uk.co.pocketworks.appero.sample.components.ThemeSelector
 import uk.co.pocketworks.appero.sdk.main.Appero
-import uk.co.pocketworks.appero.sdk.main.R as SdkR
 import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
 import uk.co.pocketworks.appero.sdk.main.ui.ApperoFeedbackUI
 import uk.co.pocketworks.appero.sdk.main.ui.theme.DarkApperoTheme
@@ -86,7 +83,7 @@ fun SampleApp() {
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(56.dp))
 
             // Title
             Text(
@@ -110,7 +107,7 @@ fun SampleApp() {
             // Rating Buttons
             RatingDemoButton(
                 label = stringResource(R.string.rating_very_positive),
-                iconRes = SdkR.drawable.rating_5,
+                iconRes = R.drawable.ic_thumbs_up_double,
                 backgroundColor = Color(0xFFD4F4DD),
                 onClick = {
                     Appero.instance.log(ExperienceRating.STRONG_POSITIVE)
@@ -121,7 +118,7 @@ fun SampleApp() {
 
             RatingDemoButton(
                 label = stringResource(R.string.rating_positive),
-                iconRes = SdkR.drawable.rating_4,
+                iconRes = R.drawable.ic_thumb_up_single,
                 backgroundColor = Color(0xFFE8F5E9),
                 onClick = {
                     Appero.instance.log(ExperienceRating.POSITIVE)
@@ -132,7 +129,7 @@ fun SampleApp() {
 
             RatingDemoButton(
                 label = stringResource(R.string.rating_neutral),
-                iconRes = SdkR.drawable.rating_3,
+                iconRes = R.drawable.ic_thumbs_up_down,
                 backgroundColor = Color(0xFFFFF3E0),
                 onClick = {
                     Appero.instance.log(ExperienceRating.NEUTRAL)
@@ -143,7 +140,7 @@ fun SampleApp() {
 
             RatingDemoButton(
                 label = stringResource(R.string.rating_negative),
-                iconRes = SdkR.drawable.rating_2,
+                iconRes = R.drawable.ic_thumb_down_single,
                 backgroundColor = Color(0xFFFFEBEE),
                 onClick = {
                     Appero.instance.log(ExperienceRating.NEGATIVE)
@@ -154,30 +151,28 @@ fun SampleApp() {
 
             RatingDemoButton(
                 label = stringResource(R.string.rating_very_negative),
-                iconRes = SdkR.drawable.rating_1,
+                iconRes = R.drawable.ic_thumbs_down_double,
                 backgroundColor = Color(0xFFFFCDD2),
                 onClick = {
                     Appero.instance.log(ExperienceRating.STRONG_NEGATIVE)
                 }
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.weight(1f))
 
             // Manual Trigger Button
             RatingDemoButton(
                 label = stringResource(R.string.manually_trigger),
-                iconRes = android.R.drawable.ic_menu_info_details,
+                iconRes = null,
                 backgroundColor = Color(0xFFF0F0F0),
-                textColor = Color(0xFF007AFF),
                 onClick = {
                     // Log a positive rating to trigger feedback prompt
-                    Appero.instance.log(ExperienceRating.POSITIVE)
-                    Appero.instance.log(ExperienceRating.POSITIVE)
-                    Appero.instance.log(ExperienceRating.POSITIVE)
+                    Appero.instance.triggerShowFeedbackPrompt()
                 }
             )
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(32.dp))
         }
 
         // Appero Feedback UI

@@ -41,6 +41,7 @@ import uk.co.pocketworks.appero.sample.components.CustomTheme2
 import uk.co.pocketworks.appero.sample.components.RatingDemoButton
 import uk.co.pocketworks.appero.sample.components.ThemeMode
 import uk.co.pocketworks.appero.sample.components.ThemeSelector
+import uk.co.pocketworks.appero.sample.ui.theme.SampleAppTheme
 import uk.co.pocketworks.appero.sdk.main.Appero
 import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
 import uk.co.pocketworks.appero.sdk.main.ui.ApperoFeedbackUI
@@ -60,7 +61,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            SampleAppTheme {
                 SampleApp()
             }
         }

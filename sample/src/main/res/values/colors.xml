@@ -7,4 +7,18 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Custom Appero Colors -->
+
+    <color name="theme_1_surface">#FF040312</color>
+    <color name="theme_1_on_surface">#FFFFFFFF</color>
+    <color name="theme_1_on_surface_variant">#FFC8C6CD</color>
+    <color name="theme_1_primary">#FF00A0E4</color>
+    <color name="theme_1_on_primary">#FFFFFFFF</color>
+
+    <color name="theme_2_surface">#FF040312</color>
+    <color name="theme_2_on_surface">#FFFFFFFF</color>
+    <color name="theme_2_on_surface_variant">#FFC8C6CD</color>
+    <color name="theme_2_primary">#FF00A0E4</color>
+    <color name="theme_2_on_primary">#FFFFFFFF</color>
 </resources>

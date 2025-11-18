@@ -14,18 +14,6 @@ import androidx.compose.runtime.staticCompositionLocalOf
 /**
  * Theme interface for Appero SDK.
  * Implement this interface to create custom themes for the feedback UI.
- *
- * Example:
- * ```kotlin
- * object CustomApperoTheme : ApperoTheme {
- *     override val colors = ApperoColors(
- *         primary = Color(0xFF6200EE),
- *         // ... customize colors
- *     )
- *     override val typography = ApperoTypography()
- *     override val shapes = ApperoShapes()
- * }
- * ```
  */
 interface ApperoTheme {
     /**
@@ -50,28 +38,18 @@ interface ApperoTheme {
  * Light theme variant
  */
 object LightApperoTheme : ApperoTheme {
-    override val colors: ApperoColors
-        get() = ApperoLightColors()
-
-    override val typography: ApperoTypography
-        get() = ApperoTypography()
-
-    override val shapes: ApperoShapes
-        get() = ApperoShapes()
+    override val colors: ApperoColors = ApperoLightColors()
+    override val typography: ApperoTypography = DefaultApperoTypography()
+    override val shapes: ApperoShapes = ApperoShapes()
 }
 
 /**
  * Dark theme variant
  */
 object DarkApperoTheme : ApperoTheme {
-    override val colors: ApperoColors
-        get() = ApperoDarkColors()
-
-    override val typography: ApperoTypography
-        get() = ApperoTypography()
-
-    override val shapes: ApperoShapes
-        get() = ApperoShapes()
+    override val colors: ApperoColors = ApperoDarkColors()
+    override val typography: ApperoTypography = DefaultApperoTypography()
+    override val shapes: ApperoShapes = ApperoShapes()
 }
 
 /**

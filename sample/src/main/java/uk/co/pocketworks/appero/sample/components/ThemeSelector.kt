@@ -34,8 +34,8 @@ import androidx.compose.ui.unit.sp
  */
 enum class ThemeMode {
     SYSTEM,
-    LIGHT,
-    DARK
+    CUSTOM_1,
+    CUSTOM_2
 }
 
 /**
@@ -88,15 +88,15 @@ fun ThemeSelector(
                 modifier = Modifier.weight(1f)
             )
             ThemeOption(
-                label = "Light",
-                isSelected = selectedTheme == ThemeMode.LIGHT,
-                onClick = { onThemeSelected(ThemeMode.LIGHT) },
+                label = "Theme 1",
+                isSelected = selectedTheme == ThemeMode.CUSTOM_1,
+                onClick = { onThemeSelected(ThemeMode.CUSTOM_1) },
                 modifier = Modifier.weight(1f)
             )
             ThemeOption(
-                label = "Dark",
-                isSelected = selectedTheme == ThemeMode.DARK,
-                onClick = { onThemeSelected(ThemeMode.DARK) },
+                label = "Theme 2",
+                isSelected = selectedTheme == ThemeMode.CUSTOM_2,
+                onClick = { onThemeSelected(ThemeMode.CUSTOM_2) },
                 modifier = Modifier.weight(1f)
             )
         }
@@ -127,7 +127,7 @@ private fun ThemeOption(
             text = label,
             fontSize = 13.sp,
             fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal,
-            color = if (isSelected) Color.Black else Color(0xFF8E8E93) // iOS gray
+            color = if (isSelected) Color.Black else Color(0xFF8E8E93)
         )
     }
 }

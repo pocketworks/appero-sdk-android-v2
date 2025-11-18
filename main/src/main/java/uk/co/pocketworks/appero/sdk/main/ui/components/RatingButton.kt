@@ -79,7 +79,7 @@ fun RatingButton(
 
     // Animate opacity transition
     val alpha by animateFloatAsState(
-        targetValue = if (isSelected) 1.0f else 0.3f,
+        targetValue = if (isSelected) 1.0f else 0.5f,
         label = "rating_alpha"
     )
 

@@ -9,6 +9,8 @@
 
 package uk.co.pocketworks.appero.sdk.main.ui
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -101,71 +103,73 @@ fun ApperoFeedbackBottomSheet(
                     isSubmitting = false
                 },
                 sheetState = sheetState,
-                shape = localApperoTheme.current.shapes.large
+                shape = localApperoTheme.current.shapes.large,
+                containerColor = localApperoTheme.current.colors.surface,
             ) {
-                when (currentScreen) {
-                    Screen.Rating -> RatingSelectionScreen(
-                        modifier = Modifier.padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 32.dp),
-                        title = uiStrings.title,
-                        subtitle = uiStrings.subtitle,
-                        selectedRating = selectedRating,
-                        onRatingSelected = { rating ->
-                            selectedRating = rating
-                            apperoInstance.analyticsDelegate?.logRatingSelected(rating.value)
-                            // Navigate to feedback input
-                            currentScreen = Screen.FeedbackInput
-                        }
-                    )
-
-                    Screen.FeedbackInput -> FeedbackInputScreen(
-                        modifier = Modifier.padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 32.dp),
-                        title = uiStrings.title,
-                        subtitle = uiStrings.subtitle,
-                        selectedRating = selectedRating,
-                        question = questionText,
-                        feedbackText = feedbackText,
-                        onFeedbackTextChange = { feedbackText = it },
-                        isSubmitting = isSubmitting,
-                        onRatingSelected = { rating ->
-                            selectedRating = rating
-                            apperoInstance.analyticsDelegate?.logRatingSelected(rating.value)
-                        },
-                        onSendFeedback = {
-                            isSubmitting = true
-                            scope.launch {
-                                // Submit feedback to Appero
-                                selectedRating?.let { rating ->
-                                    apperoInstance.postFeedback(
-                                        rating = rating,
-                                        feedback = feedbackText.ifBlank { null }
-                                    )
-
-                                    // Call analytics delegate
-                                    apperoInstance.analyticsDelegate?.logApperoFeedback(
-                                        rating.value,
-                                        feedbackText
-                                    )
-
-                                    isSubmitting = false
-                                    // Navigate to thank you screen
-                                    currentScreen = Screen.ThankYou
-                                }
+                Column(
+                    modifier = Modifier.padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 32.dp).animateContentSize()
+                ) {
+                    when (currentScreen) {
+                        Screen.Rating -> RatingSelectionScreen(
+                            title = uiStrings.title,
+                            subtitle = uiStrings.subtitle,
+                            selectedRating = selectedRating,
+                            onRatingSelected = { rating ->
+                                selectedRating = rating
+                                apperoInstance.analyticsDelegate?.logRatingSelected(rating.value)
+                                // Navigate to feedback input
+                                currentScreen = Screen.FeedbackInput
                             }
-                        },
-                    )
+                        )
 
-                    Screen.ThankYou -> ThankYouScreen(
-                        modifier = Modifier.padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 32.dp),
-                        onDone = {
-                            // Dismiss modal and reset state
-                            onDismiss()
-                            currentScreen = Screen.Rating
-                            selectedRating = null
-                            feedbackText = ""
-                        },
-                    )
+                        Screen.FeedbackInput -> FeedbackInputScreen(
+                            title = uiStrings.title,
+                            subtitle = uiStrings.subtitle,
+                            selectedRating = selectedRating,
+                            question = questionText,
+                            feedbackText = feedbackText,
+                            onFeedbackTextChange = { feedbackText = it },
+                            isSubmitting = isSubmitting,
+                            onRatingSelected = { rating ->
+                                selectedRating = rating
+                                apperoInstance.analyticsDelegate?.logRatingSelected(rating.value)
+                            },
+                            onSendFeedback = {
+                                isSubmitting = true
+                                scope.launch {
+                                    // Submit feedback to Appero
+                                    selectedRating?.let { rating ->
+                                        apperoInstance.postFeedback(
+                                            rating = rating,
+                                            feedback = feedbackText.ifBlank { null }
+                                        )
+
+                                        // Call analytics delegate
+                                        apperoInstance.analyticsDelegate?.logApperoFeedback(
+                                            rating.value,
+                                            feedbackText
+                                        )
+
+                                        isSubmitting = false
+                                        // Navigate to thank you screen
+                                        currentScreen = Screen.ThankYou
+                                    }
+                                }
+                            },
+                        )
+
+                        Screen.ThankYou -> ThankYouScreen(
+                            onDone = {
+                                // Dismiss modal and reset state
+                                onDismiss()
+                                currentScreen = Screen.Rating
+                                selectedRating = null
+                                feedbackText = ""
+                            },
+                        )
+                    }
+
                 }
-
             }
         }
     }

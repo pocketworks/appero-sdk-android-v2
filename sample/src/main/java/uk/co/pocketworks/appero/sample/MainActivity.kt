@@ -36,6 +36,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import uk.co.pocketworks.appero.sample.components.CustomTheme1
+import uk.co.pocketworks.appero.sample.components.CustomTheme2
 import uk.co.pocketworks.appero.sample.components.RatingDemoButton
 import uk.co.pocketworks.appero.sample.components.ThemeMode
 import uk.co.pocketworks.appero.sample.components.ThemeSelector
@@ -71,9 +73,7 @@ fun SampleApp() {
     val shouldShowFeedback by Appero.instance.shouldShowFeedbackPrompt.collectAsState()
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)
     ) {
         // Main content
         Column(
@@ -90,7 +90,7 @@ fun SampleApp() {
                 text = stringResource(R.string.app_name),
                 fontSize = 34.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.primary
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -177,13 +177,13 @@ fun SampleApp() {
 
         // Appero Feedback UI
         if (shouldShowFeedback) {
-            val customTheme = when (selectedTheme) {
-                ThemeMode.LIGHT -> LightApperoTheme
-                ThemeMode.DARK -> DarkApperoTheme
+            val theme = when (selectedTheme) {
+                ThemeMode.CUSTOM_1 -> CustomTheme1
+                ThemeMode.CUSTOM_2 -> CustomTheme2
                 ThemeMode.SYSTEM -> null // Use default Material 3 theme
             }
 
-            ApperoFeedbackUI(customTheme = customTheme)
+            ApperoFeedbackUI(customTheme = theme)
         }
     }
 }

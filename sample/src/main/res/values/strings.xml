@@ -18,4 +18,5 @@
 
     <!-- Actions -->
     <string name="manually_trigger">Manually Trigger Feedback</string>
+    <string name="show_dialog_fragment">Show XML Feedback Dialog</string>
 </resources>

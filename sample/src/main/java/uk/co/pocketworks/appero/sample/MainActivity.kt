@@ -10,7 +10,6 @@
 package uk.co.pocketworks.appero.sample
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -36,17 +35,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
 import uk.co.pocketworks.appero.sample.components.CustomTheme1
 import uk.co.pocketworks.appero.sample.components.CustomTheme2
 import uk.co.pocketworks.appero.sample.components.RatingDemoButton
 import uk.co.pocketworks.appero.sample.components.ThemeMode
 import uk.co.pocketworks.appero.sample.components.ThemeSelector
+import uk.co.pocketworks.appero.sample.dialogs.ApperoFeedbackDialogFragment
+import uk.co.pocketworks.appero.sample.dialogs.ThemeHolder
 import uk.co.pocketworks.appero.sample.ui.theme.SampleAppTheme
 import uk.co.pocketworks.appero.sdk.main.Appero
 import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
 import uk.co.pocketworks.appero.sdk.main.ui.ApperoFeedbackUI
-import uk.co.pocketworks.appero.sdk.main.ui.theme.DarkApperoTheme
-import uk.co.pocketworks.appero.sdk.main.ui.theme.LightApperoTheme
 
 /**
  * Main activity for the Appero SDK sample app.
@@ -57,24 +61,33 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.LightApperoTheme
  * - Automatic feedback prompt observation
  * - Feedback UI display
  */
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             SampleAppTheme {
-                SampleApp()
+                SampleApp(onShowLegacyDialog = {
+                    print("xxxxx onClick")
+                    ApperoFeedbackDialogFragment.newInstance().show(supportFragmentManager, "ApperoFeedbackDialog")
+
+                })
             }
         }
     }
 }
 
 @Composable
-fun SampleApp() {
+fun SampleApp(
+    onShowLegacyDialog: () -> Unit
+) {
     var selectedTheme by remember { mutableStateOf(ThemeMode.SYSTEM) }
     val shouldShowFeedback by Appero.instance.shouldShowFeedbackPrompt.collectAsState()
 
     Box(
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
     ) {
         // Main content
         Column(
@@ -99,7 +112,10 @@ fun SampleApp() {
             // Theme Selector
             ThemeSelector(
                 selectedTheme = selectedTheme,
-                onThemeSelected = { selectedTheme = it },
+                onThemeSelected = {
+                    selectedTheme = it
+                    ThemeHolder.currentTheme = it
+                },
                 label = stringResource(R.string.theme_label)
             )
 
@@ -168,9 +184,18 @@ fun SampleApp() {
                 iconRes = null,
                 backgroundColor = Color(0xFFF0F0F0),
                 onClick = {
-                    // Log a positive rating to trigger feedback prompt
                     Appero.instance.triggerShowFeedbackPrompt()
                 }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Legacy DialogFragment Button
+            RatingDemoButton(
+                label = stringResource(R.string.show_dialog_fragment),
+                iconRes = null,
+                backgroundColor = Color(0xFFE3F2FD),
+                onClick = onShowLegacyDialog
             )
 
             Spacer(modifier = Modifier.height(32.dp))

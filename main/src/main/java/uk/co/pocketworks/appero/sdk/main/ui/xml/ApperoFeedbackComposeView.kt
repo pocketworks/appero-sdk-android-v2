@@ -11,11 +11,20 @@ package uk.co.pocketworks.appero.sdk.main.ui.xml
 
 import android.content.Context
 import android.util.AttributeSet
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AbstractComposeView
+import androidx.compose.ui.unit.dp
 import uk.co.pocketworks.appero.sdk.main.Appero
-import uk.co.pocketworks.appero.sdk.main.ui.ApperoFeedbackUI
+import uk.co.pocketworks.appero.sdk.main.ui.ApperoFeedbackContent
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoTheme
+import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoThemeProvider
+import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
 
 /**
  * Compose View wrapper for XML layouts.
@@ -23,7 +32,11 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoTheme
  * Allows integration of Appero feedback UI into XML-based Android apps
  * that haven't migrated to Jetpack Compose yet.
  *
- * **XML Usage:**
+ * **Important:** This component uses [ApperoFeedbackContent] directly without a modal
+ * wrapper, making it suitable for use in DialogFragments or other containers that
+ * already provide modal presentation. This avoids nested modal issues.
+ *
+ * **XML Usage in DialogFragment:**
  * ```xml
  * <uk.co.pocketworks.appero.sdk.main.ui.xml.ApperoFeedbackComposeView
  *     android:id="@+id/apperoFeedbackView"
@@ -33,13 +46,15 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoTheme
  *
  * **Kotlin Usage:**
  * ```kotlin
- * class MainActivity : AppCompatActivity() {
- *     override fun onCreate(savedInstanceState: Bundle?) {
- *         super.onCreate(savedInstanceState)
- *         setContentView(R.layout.activity_main)
+ * class ApperoFeedbackDialogFragment : DialogFragment() {
+ *     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+ *         super.onViewCreated(view, savedInstanceState)
  *
- *         // Appero feedback UI is automatically displayed via the XML view
- *         // No additional code needed!
+ *         val composeView = view.findViewById<ApperoFeedbackComposeView>(R.id.apperoFeedbackView)
+ *         composeView.theme = CustomTheme // Optional
+ *
+ *         // Trigger feedback prompt
+ *         Appero.instance.triggerShowFeedbackPrompt()
  *     }
  * }
  * ```
@@ -79,9 +94,29 @@ class ApperoFeedbackComposeView @JvmOverloads constructor(
 
     @Composable
     override fun Content() {
-        ApperoFeedbackUI(
-            apperoInstance = apperoInstance,
-            customTheme = theme
-        )
+        // Observe shouldShow to conditionally render
+        val shouldShow by apperoInstance.shouldShowFeedbackPrompt.collectAsState()
+
+        if (shouldShow) {
+            ApperoThemeProvider(theme) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = localApperoTheme.current.shapes.large,
+                    color = localApperoTheme.current.colors.surface,
+                    shadowElevation = 8.dp
+                ) {
+                    ApperoFeedbackContent(
+                        apperoInstance = apperoInstance,
+                        onDismiss = { apperoInstance.dismissApperoPrompt() },
+                        modifier = Modifier.padding(
+                            start = 24.dp,
+                            top = 12.dp,
+                            end = 24.dp,
+                            bottom = 32.dp
+                        )
+                    )
+                }
+            }
+        }
     }
 }

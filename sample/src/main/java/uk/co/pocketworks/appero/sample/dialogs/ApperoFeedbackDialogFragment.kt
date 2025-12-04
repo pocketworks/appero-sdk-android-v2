@@ -47,7 +47,6 @@ class ApperoFeedbackDialogFragment : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        print("xxxxx onCreateView")
         // Inflate XML layout containing ApperoFeedbackComposeView
         return inflater.inflate(R.layout.fragment_appero_feedback_dialog, container, false)
     }
@@ -65,7 +64,6 @@ class ApperoFeedbackDialogFragment : DialogFragment() {
             ThemeMode.SYSTEM -> null  // Use default Material 3 theme
         }
         composeView.theme = apperoTheme
-        //composeView.onDismiss = {
 
         // Configure dialog window
         dialog?.window?.apply {
@@ -73,7 +71,7 @@ class ApperoFeedbackDialogFragment : DialogFragment() {
             setBackgroundDrawableResource(android.R.color.transparent)
         }
 
-        print("xxxxx onViewCreated")
+        // Trigger feedback prompt
         Appero.instance.triggerShowFeedbackPrompt()
     }
 

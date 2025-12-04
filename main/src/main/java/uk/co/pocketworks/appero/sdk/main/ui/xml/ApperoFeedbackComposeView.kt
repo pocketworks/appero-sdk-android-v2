@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.unit.dp
@@ -94,28 +92,21 @@ class ApperoFeedbackComposeView @JvmOverloads constructor(
 
     @Composable
     override fun Content() {
-        // Observe shouldShow to conditionally render
-        val shouldShow by apperoInstance.shouldShowFeedbackPrompt.collectAsState()
-
-        if (shouldShow) {
-            ApperoThemeProvider(theme) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = localApperoTheme.current.shapes.large,
-                    color = localApperoTheme.current.colors.surface,
-                    shadowElevation = 8.dp
-                ) {
-                    ApperoFeedbackContent(
-                        apperoInstance = apperoInstance,
-                        onDismiss = { apperoInstance.dismissApperoPrompt() },
-                        modifier = Modifier.padding(
-                            start = 24.dp,
-                            top = 12.dp,
-                            end = 24.dp,
-                            bottom = 32.dp
-                        )
+        ApperoThemeProvider(theme) {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = localApperoTheme.current.colors.surface,
+            ) {
+                ApperoFeedbackContent(
+                    apperoInstance = apperoInstance,
+                    onDismiss = { apperoInstance.dismissApperoPrompt() },
+                    modifier = Modifier.padding(
+                        start = 24.dp,
+                        top = 12.dp,
+                        end = 24.dp,
+                        bottom = 32.dp
                     )
-                }
+                )
             }
         }
     }

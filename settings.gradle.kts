@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Appero SDK Android"
 include(":sample")
+include(":sample-xml")
 include(":main")

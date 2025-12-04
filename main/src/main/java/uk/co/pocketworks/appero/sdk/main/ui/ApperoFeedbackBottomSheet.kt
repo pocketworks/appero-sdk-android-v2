@@ -1,5 +1,5 @@
 //
-//  ApperoFeedbackBottomSheet.kt
+//  ApperoFeedbackUI.kt
 //  Appero SDK
 //
 //  MIT License
@@ -26,34 +26,42 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoThemeProvider
 import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
 
 /**
- * Main feedback bottom sheet modal wrapper.
+ * Top-level composable for Appero feedback UI.
  *
- * Wraps [ApperoFeedbackContent] in a Material 3 [ModalBottomSheet] for Compose-based apps.
- * For XML-based apps or DialogFragment integration, use [ApperoFeedbackComposeView] instead,
- * which uses the content directly without the modal wrapper to avoid nested modals.
+ * Add this composable to your app's composition to enable automatic
+ * feedback collection. The modal will appear automatically when the
+ * Appero SDK determines it's appropriate based on user experiences.
  *
- * **Usage:**
+ * **WCAG 2.2 Level AA Accessibility:**
+ * This component is fully accessible with:
+ * - TalkBack/screen reader compatibility
+ * - Minimum 48dp touch targets (64dp for rating icons)
+ * - 4.5:1 text contrast, 3:1 UI element contrast
+ * - Supports text scaling up to 200%
+ * - Proper focus management and keyboard navigation
+ * - Screen reader announcements for state changes
+ * - Information conveyed by both color and shape
+ *
+ * **Example usage:**
  * ```kotlin
  * @Composable
- * fun MyScreen() {
- *     MyContent()
+ * fun MyApp() {
+ *     MaterialTheme {
+ *         MyScreen()
  *
- *     // Feedback UI appears automatically when triggered
- *     ApperoFeedbackBottomSheet()
+ *         // Add Appero feedback UI
+ *         ApperoFeedbackUI()
+ *     }
  * }
  * ```
  *
- * **Observes StateFlows from Appero singleton:**
- * - shouldShowFeedbackPrompt: Controls visibility
- *
- * **WCAG Compliance:**
- * - No focus traps (back button dismisses)
- * - Modal announced to screen readers
- * - Proper state management and transitions
+ * **With custom theme:**
+ * ```kotlin
+ * ApperoFeedbackUI(theme = CustomApperoTheme)
+ * ```
  *
  * @param apperoInstance The Appero SDK instance (defaults to singleton)
- * @param customTheme Custom theme (defaults to Material 3 adaptive theme)
- * @param onDismiss Callback when modal is dismissed
+ * @param customTheme Custom theme configuration (defaults to Material 3 adaptive theme)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

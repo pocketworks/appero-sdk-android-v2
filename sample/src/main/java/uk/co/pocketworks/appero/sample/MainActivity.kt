@@ -36,21 +36,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import kotlinx.coroutines.launch
 import uk.co.pocketworks.appero.sample.components.CustomTheme1
 import uk.co.pocketworks.appero.sample.components.CustomTheme2
 import uk.co.pocketworks.appero.sample.components.RatingDemoButton
 import uk.co.pocketworks.appero.sample.components.ThemeMode
 import uk.co.pocketworks.appero.sample.components.ThemeSelector
-import uk.co.pocketworks.appero.sample.dialogs.ApperoFeedbackDialogFragment
-import uk.co.pocketworks.appero.sample.dialogs.ThemeHolder
 import uk.co.pocketworks.appero.sample.ui.theme.SampleAppTheme
 import uk.co.pocketworks.appero.sdk.main.Appero
 import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
-import uk.co.pocketworks.appero.sdk.main.ui.ApperoFeedbackUI
+import uk.co.pocketworks.appero.sdk.main.ui.ApperoFeedbackBottomSheet
 
 /**
  * Main activity for the Appero SDK sample app.
@@ -67,20 +61,14 @@ class MainActivity : FragmentActivity() {
 
         setContent {
             SampleAppTheme {
-                SampleApp(onShowLegacyDialog = {
-                    print("xxxxx onClick")
-                    ApperoFeedbackDialogFragment.newInstance().show(supportFragmentManager, "ApperoFeedbackDialog")
-
-                })
+                SampleApp()
             }
         }
     }
 }
 
 @Composable
-fun SampleApp(
-    onShowLegacyDialog: () -> Unit
-) {
+fun SampleApp() {
     var selectedTheme by remember { mutableStateOf(ThemeMode.SYSTEM) }
     val shouldShowFeedback by Appero.instance.shouldShowFeedbackPrompt.collectAsState()
 
@@ -114,7 +102,6 @@ fun SampleApp(
                 selectedTheme = selectedTheme,
                 onThemeSelected = {
                     selectedTheme = it
-                    ThemeHolder.currentTheme = it
                 },
                 label = stringResource(R.string.theme_label)
             )
@@ -188,16 +175,6 @@ fun SampleApp(
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Legacy DialogFragment Button
-            RatingDemoButton(
-                label = stringResource(R.string.show_dialog_fragment),
-                iconRes = null,
-                backgroundColor = Color(0xFFE3F2FD),
-                onClick = onShowLegacyDialog
-            )
-
             Spacer(modifier = Modifier.height(32.dp))
         }
 
@@ -209,7 +186,7 @@ fun SampleApp(
                 ThemeMode.SYSTEM -> null // Use default Material 3 theme
             }
 
-            ApperoFeedbackUI(customTheme = theme)
+            ApperoFeedbackBottomSheet(customTheme = theme)
         }
     }
 }

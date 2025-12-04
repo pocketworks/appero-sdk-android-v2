@@ -85,11 +85,6 @@ class Appero private constructor() : LifecycleEventObserver {
          */
         val instance: Appero by lazy { Appero() }
 
-        /**
-         * Notification name constant for XML-based apps.
-         * Use this with NotificationCenter or similar to observe feedback prompt events.
-         */
-        const val APPERO_FEEDBACK_PROMPT_NOTIFICATION = "kApperoFeedbackPromptNotification"
         const val APPERO_FEEDBACK_MAX_LENGTH = 240
     }
 
@@ -548,11 +543,6 @@ class Appero private constructor() : LifecycleEventObserver {
         )
 
         updateApperoData { updatedData }
-
-        @Suppress("ForbiddenComment")
-        if (shouldShow) {
-            // TODO: Post notification for XML-based apps if needed
-        }
     }
 
     private fun updateApperoData(update: (ApperoData) -> ApperoData) {

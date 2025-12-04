@@ -73,9 +73,9 @@ import uk.co.pocketworks.appero.sdk.main.ui.screens.ThankYouScreen
  */
 @Composable
 fun ApperoFeedbackContent(
-    apperoInstance: Appero = Appero.instance,
-    onDismiss: () -> Unit = { apperoInstance.dismissApperoPrompt() },
     modifier: Modifier = Modifier,
+    apperoInstance: Appero = Appero.instance,
+    onDismiss: () -> Unit,
 ) {
     // Observe StateFlows from Appero instance
     val uiStrings by apperoInstance.feedbackUIStrings.collectAsState()

@@ -114,7 +114,10 @@ fun SampleApp() {
                 iconRes = R.drawable.ic_thumbs_up_double,
                 backgroundColor = Color(0xFFD4F4DD),
                 onClick = {
-                    Appero.instance.log(ExperienceRating.STRONG_POSITIVE)
+                    Appero.instance.log(
+                        ExperienceRating.STRONG_POSITIVE,
+                        detail = "Strong positive from compose sample app"
+                    )
                 }
             )
 
@@ -125,7 +128,7 @@ fun SampleApp() {
                 iconRes = R.drawable.ic_thumb_up_single,
                 backgroundColor = Color(0xFFE8F5E9),
                 onClick = {
-                    Appero.instance.log(ExperienceRating.POSITIVE)
+                    Appero.instance.log(ExperienceRating.POSITIVE, detail = "Positive from compose sample app")
                 }
             )
 
@@ -136,7 +139,7 @@ fun SampleApp() {
                 iconRes = R.drawable.ic_thumbs_up_down,
                 backgroundColor = Color(0xFFFFF3E0),
                 onClick = {
-                    Appero.instance.log(ExperienceRating.NEUTRAL)
+                    Appero.instance.log(ExperienceRating.NEUTRAL, detail = "Neutral from compose sample app")
                 }
             )
 
@@ -147,7 +150,7 @@ fun SampleApp() {
                 iconRes = R.drawable.ic_thumb_down_single,
                 backgroundColor = Color(0xFFFFEBEE),
                 onClick = {
-                    Appero.instance.log(ExperienceRating.NEGATIVE)
+                    Appero.instance.log(ExperienceRating.NEGATIVE, detail = "Negative from compose sample app")
                 }
             )
 
@@ -158,7 +161,10 @@ fun SampleApp() {
                 iconRes = R.drawable.ic_thumbs_down_double,
                 backgroundColor = Color(0xFFFFCDD2),
                 onClick = {
-                    Appero.instance.log(ExperienceRating.STRONG_NEGATIVE)
+                    Appero.instance.log(
+                        ExperienceRating.STRONG_NEGATIVE,
+                        detail = "Strong negative from compose sample app"
+                    )
                 }
             )
 

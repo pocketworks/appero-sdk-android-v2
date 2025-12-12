@@ -117,6 +117,7 @@ fun ApperoFeedbackContent(
             Screen.FeedbackInput -> FeedbackInputScreen(
                 title = uiStrings.title,
                 subtitle = uiStrings.subtitle,
+                feedbackHint = uiStrings.prompt,
                 selectedRating = selectedRating,
                 question = questionText,
                 feedbackText = feedbackText,

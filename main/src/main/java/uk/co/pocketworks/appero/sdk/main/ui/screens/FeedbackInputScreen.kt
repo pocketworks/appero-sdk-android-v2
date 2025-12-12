@@ -57,6 +57,7 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
  *
  * @param title Main heading text
  * @param subtitle Secondary text
+ * @param feedbackHint Hint displayed in the feedback input field
  * @param selectedRating The rating user selected
  * @param question Dynamic question based on rating
  * @param feedbackText Current feedback text value
@@ -69,6 +70,7 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
 fun FeedbackInputScreen(
     title: String,
     subtitle: String,
+    feedbackHint: String,
     selectedRating: ExperienceRating?,
     question: String,
     feedbackText: String,
@@ -129,7 +131,7 @@ fun FeedbackInputScreen(
         FeedbackTextField(
             value = feedbackText,
             onValueChange = onFeedbackTextChange,
-            placeholder = stringResource(R.string.default_ui_prompt)
+            placeholder = feedbackHint
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -178,6 +180,7 @@ private fun FeedbackInputScreenPositivePreview() {
         FeedbackInputScreen(
             title = "We're happy to see that you're using Carbs & Cals 🎉",
             subtitle = "Let us know how we're doing",
+            feedbackHint = "Share what you think",
             selectedRating = ExperienceRating.POSITIVE,
             question = "What made your experience positive?",
             feedbackText = "",
@@ -196,6 +199,7 @@ private fun FeedbackInputScreenNegativePreview() {
         FeedbackInputScreen(
             title = "We're happy to see that you're using Carbs & Cals 🎉",
             subtitle = "Let us know how we're doing",
+            feedbackHint = "Share what you think",
             selectedRating = ExperienceRating.NEGATIVE,
             question = "We're sorry you're not enjoying it. Could you tell us what went wrong?",
             feedbackText = "The search feature is not working properly.",
@@ -214,6 +218,7 @@ private fun FeedbackInputScreenLoadingPreview() {
         FeedbackInputScreen(
             title = "We're happy to see that you're using Carbs & Cals 🎉",
             subtitle = "Let us know how we're doing",
+            feedbackHint = "Share you thoughts here",
             selectedRating = ExperienceRating.STRONG_POSITIVE,
             question = "What made your experience positive?",
             feedbackText = "Love the barcode scanner feature!",

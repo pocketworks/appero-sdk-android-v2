@@ -58,7 +58,12 @@ fun RatingSelector(
     ) {
         // Display all 5 rating options
         ExperienceRating.entries.forEach { rating ->
-            Box(modifier = Modifier.padding(all = 8.dp).height(56.dp).width(56.dp)) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)  // Equal space for all buttons
+                    .padding(all = 8.dp)
+                    .height(56.dp)
+            ) {
                 RatingButton(
                     rating = rating,
                     isSelected = selectedRating == rating,

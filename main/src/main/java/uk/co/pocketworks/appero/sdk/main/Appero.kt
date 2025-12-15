@@ -218,7 +218,7 @@ class Appero private constructor() : LifecycleEventObserver {
             )
         }
 
-        retryManager?.start()
+        retryManager?.init()
 
         ApperoLogger.log("Appero SDK initialized")
     }
@@ -257,7 +257,7 @@ class Appero private constructor() : LifecycleEventObserver {
         ApperoLogger.log("Cleaning up Appero SDK resources")
 
         // Stop retry manager
-        retryManager?.stop()
+        retryManager?.dispose()
         retryManager = null
 
         // Unregister network monitor
@@ -510,7 +510,7 @@ class Appero private constructor() : LifecycleEventObserver {
             )
         })
         ApperoLogger.log(
-            "Queued experience for retry. Total queued: ${(apperoDataState.value?.unsentExperiences?.size ?: 0) + 1}"
+            "Queued experience for retry. Total queued: ${(apperoDataState.value?.unsentExperiences?.size ?: 0)}"
         )
     }
 
@@ -521,7 +521,7 @@ class Appero private constructor() : LifecycleEventObserver {
             )
         })
         ApperoLogger.log(
-            "Queued feedback for retry. Total queued: ${(apperoDataState.value?.unsentFeedback?.size ?: 0) + 1}"
+            "Queued feedback for retry. Total queued: ${(apperoDataState.value?.unsentFeedback?.size ?: 0)}"
         )
     }
 

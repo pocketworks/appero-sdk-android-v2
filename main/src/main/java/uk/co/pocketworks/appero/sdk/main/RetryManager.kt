@@ -13,7 +13,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIClient
@@ -40,40 +39,57 @@ internal class RetryManager(
     private val scope: CoroutineScope,
 ) {
     private var retryJob: Job? = null
+    private var networkMonitorJob: Job? = null
     private val retryIntervalMs = 180_000L // 3 minutes
 
     /**
-     * Starts the retry mechanism.
+     * Initialize the retry mechanism.
      * Will periodically attempt to process queued items.
      */
-    fun start() {
-        if (retryJob?.isActive == true) {
-            return // Already running
-        }
-
-        retryJob = scope.launch(Dispatchers.IO) {
-            while (isActive) {
-                delay(retryIntervalMs)
-
-                val isConnected = networkMonitor.isConnected.first()
-                if (!isConnected || networkMonitor.forceOfflineMode) {
-                    ApperoLogger.log("No connectivity - skipping retry")
-                    continue
+    fun init() {
+        ApperoLogger.log("Initializing retry mechanism")
+        networkMonitorJob = scope.launch {
+            networkMonitor.isConnected.collect { isConnected ->
+                if (isConnected && !networkMonitor.forceOfflineMode) {
+                    startRetrying()
+                } else {
+                    stopRetrying()
                 }
-
-                ApperoLogger.log("Attempting to send queued experiences/feedback")
-                processUnsentExperiences()
-                processUnsentFeedback()
             }
         }
     }
 
-    /**
-     * Stops the retry mechanism.
-     */
-    fun stop() {
+    private fun startRetrying() {
+        if (retryJob?.isActive == true) {
+            return // Already running
+        }
+
+        ApperoLogger.log("Starting retry mechanism")
+        retryJob = scope.launch(Dispatchers.IO) {
+            while (isActive) {
+                ApperoLogger.log("Attempting to send queued experiences/feedback")
+                processUnsentExperiences()
+                processUnsentFeedback()
+
+                delay(retryIntervalMs)
+            }
+        }
+    }
+
+    private fun stopRetrying() {
+        ApperoLogger.log("Stopping retry mechanism")
         retryJob?.cancel()
         retryJob = null
+    }
+
+    /**
+     * Disposes the retry mechanism.
+     */
+    fun dispose() {
+        ApperoLogger.log("Disposing retry mechanism")
+        stopRetrying()
+        networkMonitorJob?.cancel()
+        networkMonitorJob = null
     }
 
     /**
@@ -119,6 +135,7 @@ internal class RetryManager(
                     ApperoLogger.log("Experience posted successfully")
                     successfullyProcessed.add(experience)
                 }
+
                 is ApperoAPIResponse.Error -> {
                     ApperoLogger.log(
                         "Failed to send queued experience ${index + 1}/${queuedExperiences.size}: ${result.error}"
@@ -180,6 +197,7 @@ internal class RetryManager(
                     ApperoLogger.log("Feedback posted successfully")
                     successfullyProcessed.add(feedback)
                 }
+
                 is ApperoAPIResponse.Error -> {
                     ApperoLogger.log(
                         "Failed to send queued feedback ${index + 1}/${queuedFeedback.size}: ${result.error}"

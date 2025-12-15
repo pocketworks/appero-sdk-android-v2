@@ -218,7 +218,7 @@ private fun FeedbackInputScreenNegativePreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "id:Nexus S")
 @Composable
 private fun FeedbackInputScreenLoadingPreview() {
     ApperoThemeProvider {

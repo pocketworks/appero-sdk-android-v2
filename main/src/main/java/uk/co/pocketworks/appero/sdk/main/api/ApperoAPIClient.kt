@@ -73,7 +73,7 @@ internal object ApperoAPIClient {
 
             if (isDebug) {
                 install(Logging) {
-                    level = LogLevel.INFO
+                    level = LogLevel.ALL
                 }
             }
         }

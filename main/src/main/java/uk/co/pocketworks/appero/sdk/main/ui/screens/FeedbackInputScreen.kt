@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
@@ -61,6 +60,8 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
  * @param selectedRating The rating user selected
  * @param question Dynamic question based on rating
  * @param feedbackText Current feedback text value
+ * @param onRatingSelected Callback when a rating is selected
+ * @param showRatings Whether to show rating icons
  * @param onFeedbackTextChange Callback when feedback text changes
  * @param onSendFeedback Callback when send button is tapped
  * @param isSubmitting Whether feedback is currently being submitted
@@ -74,6 +75,7 @@ fun FeedbackInputScreen(
     selectedRating: ExperienceRating?,
     question: String,
     feedbackText: String,
+    showRatings: Boolean,
     onFeedbackTextChange: (String) -> Unit,
     onRatingSelected: (ExperienceRating) -> Unit,
     onSendFeedback: () -> Unit,
@@ -91,7 +93,9 @@ fun FeedbackInputScreen(
             style = theme.typography.titleLarge,
             color = theme.colors.onSurface,
             textAlign = TextAlign.Center,
-            modifier = Modifier.semantics { heading() }.align(Alignment.CenterHorizontally)
+            modifier = Modifier
+                .semantics { heading() }
+                .align(Alignment.CenterHorizontally)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -106,24 +110,24 @@ fun FeedbackInputScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-
         // Show selected rating (read-only)
-        RatingSelector(
-            selectedRating = selectedRating,
-            onRatingSelected = onRatingSelected,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-        )
+        if (showRatings) {
+            RatingSelector(
+                selectedRating = selectedRating,
+                onRatingSelected = onRatingSelected,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Dynamic question
-        Text(
-            text = question,
-            style = theme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            color = theme.colors.onSurfaceVariant,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-        )
+            // Dynamic question
+            Text(
+                text = question,
+                style = theme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                color = theme.colors.onSurfaceVariant,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -131,6 +135,7 @@ fun FeedbackInputScreen(
         FeedbackTextField(
             value = feedbackText,
             onValueChange = onFeedbackTextChange,
+            tall = !showRatings,
             placeholder = feedbackHint
         )
 
@@ -183,6 +188,7 @@ private fun FeedbackInputScreenPositivePreview() {
             feedbackHint = "Share what you think",
             selectedRating = ExperienceRating.POSITIVE,
             question = "What made your experience positive?",
+            showRatings = true,
             feedbackText = "",
             onFeedbackTextChange = {},
             onRatingSelected = {},
@@ -202,6 +208,7 @@ private fun FeedbackInputScreenNegativePreview() {
             feedbackHint = "Share what you think",
             selectedRating = ExperienceRating.NEGATIVE,
             question = "We're sorry you're not enjoying it. Could you tell us what went wrong?",
+            showRatings = false,
             feedbackText = "The search feature is not working properly.",
             onFeedbackTextChange = {},
             onRatingSelected = {},
@@ -221,6 +228,7 @@ private fun FeedbackInputScreenLoadingPreview() {
             feedbackHint = "Share you thoughts here",
             selectedRating = ExperienceRating.STRONG_POSITIVE,
             question = "What made your experience positive?",
+            showRatings = true,
             feedbackText = "Love the barcode scanner feature!",
             onFeedbackTextChange = {},
             onSendFeedback = {},

@@ -45,6 +45,7 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
  *
  * @param value Current text value
  * @param onValueChange Callback when text changes
+ * @param tall Whether the field should be tall (6-8 lines)
  * @param placeholder Placeholder text shown when empty
  * @param maxLength Maximum number of characters allowed
  * @param modifier Optional modifier for customization
@@ -54,6 +55,7 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
 fun FeedbackTextField(
     modifier: Modifier = Modifier,
     value: String,
+    tall: Boolean,
     onValueChange: (String) -> Unit,
     placeholder: String,
     maxLength: Int = Appero.APPERO_FEEDBACK_MAX_LENGTH,
@@ -91,8 +93,8 @@ fun FeedbackTextField(
                     // WCAG: Announce character limit to screen readers
                     stateDescription = characterCountText
                 },
-            minLines = 4,
-            maxLines = 6,
+            minLines = if (tall) 6 else 4,
+            maxLines = if (tall) 8 else 6,
             textStyle = theme.typography.bodyMedium.copy(
                 color = theme.colors.onSurface
             ),

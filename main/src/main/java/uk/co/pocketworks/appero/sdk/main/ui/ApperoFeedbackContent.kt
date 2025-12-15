@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import uk.co.pocketworks.appero.sdk.main.Appero
 import uk.co.pocketworks.appero.sdk.main.R
 import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
+import uk.co.pocketworks.appero.sdk.main.model.FlowType
 import uk.co.pocketworks.appero.sdk.main.ui.screens.FeedbackInputScreen
 import uk.co.pocketworks.appero.sdk.main.ui.screens.RatingSelectionScreen
 import uk.co.pocketworks.appero.sdk.main.ui.screens.ThankYouScreen
@@ -82,8 +83,14 @@ fun ApperoFeedbackContent(
     val flowType by apperoInstance.flowType.collectAsState()
 
     // Internal navigation state
-    var currentScreen by remember { mutableStateOf(Screen.Rating) }
-    var selectedRating by remember { mutableStateOf<ExperienceRating?>(null) }
+    var currentScreen by remember { mutableStateOf(when(flowType) {
+        FlowType.POSITIVE, FlowType.NEUTRAL -> Screen.Rating
+        FlowType.NEGATIVE -> Screen.FeedbackInput
+    })}
+    var selectedRating by remember { mutableStateOf(when (flowType){
+        FlowType.NEGATIVE -> ExperienceRating.STRONG_NEGATIVE
+        else -> null
+    }) }
     var feedbackText by remember { mutableStateOf("") }
     var isSubmitting by remember { mutableStateOf(false) }
 
@@ -121,6 +128,7 @@ fun ApperoFeedbackContent(
                 selectedRating = selectedRating,
                 question = questionText,
                 feedbackText = feedbackText,
+                showRatings = flowType != FlowType.NEGATIVE,
                 onFeedbackTextChange = { feedbackText = it },
                 isSubmitting = isSubmitting,
                 onRatingSelected = { rating ->

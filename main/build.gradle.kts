@@ -1,3 +1,5 @@
+import java.net.URL
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -159,4 +161,23 @@ mavenPublishing {
 
     // Enable GPG signing for all publications
     signAllPublications()
+}
+
+dokka {
+    moduleName.set(project.name)
+    dokkaPublications.html {
+        suppressInheritedMembers.set(true)
+        failOnWarning.set(true)
+    }
+    dokkaSourceSets.main {
+        includes.from("../README.md")
+        sourceLink {
+            localDirectory.set(file("src/main/java"))
+            remoteUrl(property("POM_URL").toString())
+            remoteLineSuffix.set("#L")
+        }
+    }
+    pluginsConfiguration.html {
+        footerMessage.set("Copyright (c) 2025 Pocketworks Mobile")
+    }
 }

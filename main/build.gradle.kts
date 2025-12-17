@@ -1,5 +1,3 @@
-import java.net.URL
-
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)

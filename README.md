@@ -1,4 +1,4 @@
-# Appero SDK for Android
+# Module Appero SDK for Android
 
 The in-app feedback widget that drives organic growth.
 

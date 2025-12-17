@@ -4,7 +4,7 @@
 //
 //  MIT License
 //
-//  Copyright (c) 2024 Pocketworks Mobile
+//  Copyright (c) 2025 Pocketworks Mobile
 //
 
 package uk.co.pocketworks.appero.sdk.main.util
@@ -29,7 +29,7 @@ internal object ApperoLogger {
     }
 
     /**
-     * Logs a debug message with [Appero] prefix.
+     * Logs a debug message with [uk.co.pocketworks.appero.sdk.main.Appero] prefix.
      *
      * @param message The message to log
      */

@@ -4,7 +4,7 @@
 //
 //  MIT License
 //
-//  Copyright (c) 2024 Pocketworks Mobile
+//  Copyright (c) 2025 Pocketworks Mobile
 //
 
 package uk.co.pocketworks.appero.sdk.main.analytics
@@ -12,7 +12,7 @@ package uk.co.pocketworks.appero.sdk.main.analytics
 /**
  * Interface for integrating Appero events with third-party analytics services.
  *
- * Implement this interface and set it on [Appero.analyticsDelegate] to receive
+ * Implement this interface and set it on Appero.analyticsDelegate to receive
  * callbacks when users interact with the Appero feedback UI.
  *
  * Example usage:

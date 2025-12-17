@@ -4,7 +4,16 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.maven.publish)
 }
+
+// Read version from gradle.properties
+val versionName = property("VERSION_NAME").toString()
+val libraryGroup = property("GROUP").toString()
+
+group = libraryGroup
+version = versionName
 
 android {
     namespace = "uk.co.pocketworks.appero.sdk.main"
@@ -18,7 +27,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
 
-        buildConfigField("String", "SDK_VERSION", "\"1.0.0-alpha\"")
+        buildConfigField("String", "SDK_VERSION", "\"${versionName}\"")
     }
 
     buildTypes {
@@ -85,4 +94,69 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     testImplementation(kotlin("test"))
+}
+
+// Maven Publishing Configuration
+mavenPublishing {
+    // Read properties from gradle.properties
+    val pomArtifactId = property("POM_ARTIFACT_ID").toString()
+    val pomName = property("POM_NAME").toString()
+    val pomDescription = property("POM_DESCRIPTION").toString()
+    val pomInceptionYear = property("POM_INCEPTION_YEAR").toString()
+    val pomUrl = property("POM_URL").toString()
+
+    val pomLicenceName = property("POM_LICENCE_NAME").toString()
+    val pomLicenceUrl = property("POM_LICENCE_URL").toString()
+    val pomLicenceDist = property("POM_LICENCE_DIST").toString()
+
+    val pomDeveloperId = property("POM_DEVELOPER_ID").toString()
+    val pomDeveloperName = property("POM_DEVELOPER_NAME").toString()
+    val pomDeveloperUrl = property("POM_DEVELOPER_URL").toString()
+    val pomDeveloperEmail = property("POM_DEVELOPER_EMAIL").toString()
+
+    val pomScmUrl = property("POM_SCM_URL").toString()
+    val pomScmConnection = property("POM_SCM_CONNECTION").toString()
+    val pomScmDevConnection = property("POM_SCM_DEV_CONNECTION").toString()
+
+    coordinates(
+        groupId = group.toString(),
+        artifactId = pomArtifactId,
+        version = version.toString()
+    )
+
+    pom {
+        name.set(pomName)
+        description.set(pomDescription)
+        inceptionYear.set(pomInceptionYear)
+        url.set(pomUrl)
+
+        licenses {
+            license {
+                name.set(pomLicenceName)
+                url.set(pomLicenceUrl)
+                distribution.set(pomLicenceDist)
+            }
+        }
+
+        developers {
+            developer {
+                id.set(pomDeveloperId)
+                name.set(pomDeveloperName)
+                url.set(pomDeveloperUrl)
+                email.set(pomDeveloperEmail)
+            }
+        }
+
+        scm {
+            url.set(pomScmUrl)
+            connection.set(pomScmConnection)
+            developerConnection.set(pomScmDevConnection)
+        }
+    }
+
+    // Configure publishing to Maven Central (OSSRH s01)
+    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01, automaticRelease = true)
+
+    // Enable GPG signing for all publications
+    signAllPublications()
 }

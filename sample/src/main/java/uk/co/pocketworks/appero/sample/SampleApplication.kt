@@ -25,7 +25,7 @@ class SampleApplication : Application() {
         // Initialize Appero SDK
         Appero.instance.start(
             context = this,
-            apiKey = "mLqKSXRmDHgf0bumN3hkxBAO6idIA4KB9nXkyA1nkc4",
+            apiKey = "my_api_key",
             userId = "demo_user_123",
             debug = true // Enable debug logging for sample app
         )

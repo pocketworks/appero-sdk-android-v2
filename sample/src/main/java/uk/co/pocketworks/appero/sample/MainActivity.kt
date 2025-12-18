@@ -31,16 +31,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
 import uk.co.pocketworks.appero.sample.components.CustomTheme1
-import uk.co.pocketworks.appero.sample.components.CustomTheme2
 import uk.co.pocketworks.appero.sample.components.RatingDemoButton
 import uk.co.pocketworks.appero.sample.components.ThemeMode
 import uk.co.pocketworks.appero.sample.components.ThemeSelector
+import uk.co.pocketworks.appero.sample.components.customTheme2
 import uk.co.pocketworks.appero.sample.ui.theme.SampleAppTheme
 import uk.co.pocketworks.appero.sdk.main.Appero
 import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
@@ -188,7 +189,7 @@ fun SampleApp() {
         if (shouldShowFeedback) {
             val theme = when (selectedTheme) {
                 ThemeMode.CUSTOM_1 -> CustomTheme1
-                ThemeMode.CUSTOM_2 -> CustomTheme2
+                ThemeMode.CUSTOM_2 -> customTheme2(LocalContext.current)
                 ThemeMode.SYSTEM -> null // Use default Material 3 theme
             }
 

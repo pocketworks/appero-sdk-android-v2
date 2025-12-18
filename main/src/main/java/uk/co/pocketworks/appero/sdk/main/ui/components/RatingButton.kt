@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -34,6 +34,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import uk.co.pocketworks.appero.sdk.main.R
 import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
+import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
 
 /**
  * WCAG-compliant rating button component.
@@ -68,14 +69,10 @@ fun RatingButton(
         }
     )
 
-    // Get drawable resource for this rating
-    val iconRes = when (rating) {
-        ExperienceRating.STRONG_NEGATIVE -> R.drawable.rating_1
-        ExperienceRating.NEGATIVE -> R.drawable.rating_2
-        ExperienceRating.NEUTRAL -> R.drawable.rating_3
-        ExperienceRating.POSITIVE -> R.drawable.rating_4
-        ExperienceRating.STRONG_POSITIVE -> R.drawable.rating_5
-    }
+    // Get painter from theme with context for cross-module resource access
+    val context = LocalContext.current
+    val theme = localApperoTheme.current
+    val painter = theme.ratingImages.getPainterForRating(rating)
 
     // Animate opacity transition
     val alpha by animateFloatAsState(
@@ -107,7 +104,7 @@ fun RatingButton(
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            painter = painterResource(id = iconRes),
+            painter = painter,
             contentDescription = null, // Handled by parent semantics
             tint = Color.Unspecified, // Use original drawable colors
         )

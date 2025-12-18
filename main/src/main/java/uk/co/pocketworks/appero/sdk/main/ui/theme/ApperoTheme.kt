@@ -32,6 +32,17 @@ interface ApperoTheme {
      * Shape definitions for UI components.
      */
     val shapes: ApperoShapes
+
+    /**
+     * Rating icon images for the theme.
+     * Allows customization of rating button visuals without modifying components.
+     *
+     * Defaults to emoji-style SVG drawables if not overridden.
+     * Users can provide custom implementations using any Painter source.
+     *
+     * @see ApperoRatingImages
+     */
+    val ratingImages: ApperoRatingImages
 }
 
 /**
@@ -41,6 +52,7 @@ object LightApperoTheme : ApperoTheme {
     override val colors: ApperoColors = ApperoLightColors()
     override val typography: ApperoTypography = DefaultApperoTypography()
     override val shapes: ApperoShapes = ApperoShapes()
+    override val ratingImages: ApperoRatingImages = DefaultApperoRatingImages()
 }
 
 /**
@@ -50,6 +62,7 @@ object DarkApperoTheme : ApperoTheme {
     override val colors: ApperoColors = ApperoDarkColors()
     override val typography: ApperoTypography = DefaultApperoTypography()
     override val shapes: ApperoShapes = ApperoShapes()
+    override val ratingImages: ApperoRatingImages = DefaultApperoRatingImages()
 }
 
 /**

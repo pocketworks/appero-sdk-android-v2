@@ -1,31 +1,52 @@
 # Agents.md for Android SDK (Kotlin + Jetpack Compose)
 
 ## Overview
-This is a native Android SDK written in Kotlin, using Jetpack Compose for the UI layer. The SDK follows modern Android development best practices with a focus on modularity, readability, and testability.
+
+This is a native Android SDK written in Kotlin, using Jetpack Compose for the UI layer. The SDK follows modern Android
+development best practices with a focus on modularity, readability, and testability.
 
 ## Coding Practices
-- **Kotlin idiomatic style:** Use Kotlin best practices including clear naming, data classes, sealed classes, extension functions, and coroutines for asynchronous work.
-- **Jetpack Compose for UI:** All UI components must be composed with Jetpack Compose, avoiding XML layouts entirely. Use state hoisting and unidirectional data flow to keep UI state predictable.
+
+- **Kotlin idiomatic style:** Use Kotlin best practices including clear naming, data classes, sealed classes, extension
+  functions, and coroutines for asynchronous work.
+- **Kotlin linting:** Follow linting rules setup in the detekt.yml file located in the project's root
+  directory
+- **Jetpack Compose for UI:** All UI components must be composed with Jetpack Compose, avoiding XML layouts entirely.
+  Use state hoisting and unidirectional data flow to keep UI state predictable.
+- **SOLID:** Follow coding practices in line with SOLID principles
 - **Clean Architecture:** Separate concerns following layered architecture principles:
-  - `api` packages expose consumable interfaces and data models.
-  - `internal` packages contain implementation details encapsulated with limited visibility.
-  - Modularize features to isolate and reduce dependencies.
+    - `api` packages expose consumable interfaces and data models.
+    - `internal` packages contain implementation details encapsulated with limited visibility.
+    - Modularize features to isolate and reduce dependencies.
 - **Dependency Injection:** Use constructor injection for dependencies to enable easy mocking and testing.
-- **Immutability and Side-effect management:** Favor immutable state and pure functions where possible. Use Compose side-effect APIs carefully.
+- **Immutability and Side-effect management:** Favor immutable state and pure functions where possible. Use Compose
+  side-effect APIs carefully.
 - **Error handling:** Use Kotlin’s sealed classes/result wrappers for robust error handling in API surfaces.
-- **Documentation:** Write concise KDoc for all public API classes and functions to improve code navigation and comprehension.
+- **Documentation:** Write concise KDoc for all public API classes and functions to improve code navigation and
+  comprehension.
 
 ## Testability Guidelines
-- **Package encapsulation:** Keep internal code out of public API packages. Make internals package-private or `internal` in Kotlin.
+
+- **Package encapsulation:** Keep internal code out of public API packages. Make internals package-private or `internal`
+  in Kotlin.
 - **Unit tests:** Place tests under `src/test` and restrict access to internal packages.
 - **UI tests:** Use `src/androidTest` for Compose UI tests focused on public API usage.
 - **Separate test utilities:** Extract reusable test helpers/mocks into a dedicated internal test package.
 
 ## Build and Module Setup
+
 - Define the SDK as an Android Library (`com.android.library`) module.
 - Use Gradle proper dependency scopes (`api`, `implementation`) to control visibility and packaging of dependencies.
 - Release SDK as `.aar` packaged with obfuscated internals using R8/ProGuard.
 
+## AI Interaction Rules
+
+- Always provide explanations with suggested code changes
+- Prioritize null safety and efficient resource usage
+- Do not modify files in /third_party/ or /generated/
+- Use formal, concise tone in code comments
+
 ***
 
-Keep this document updated as the SDK evolves to ensure AI agents have accurate, contextual guidance for generating high-quality, maintainable code aligned with the SDK's architectural vision and standards.
+Keep this document updated as the SDK evolves to ensure AI agents have accurate, contextual guidance for generating
+high-quality, maintainable code aligned with the SDK's architectural vision and standards.

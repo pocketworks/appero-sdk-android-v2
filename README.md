@@ -1,44 +1,160 @@
-# Appero SDK
+# Appero SDK for Android
 
 The in-app feedback widget that drives organic growth.
 
-Appero caches experiences and feedback that have been logged to a json file, so that in the event that the user's device is offline or a network request fails, we don't lose any data. Appero will attempt to resend this data later when the connection is restored. The json file is stored in your app's internal storage. The file can be cleared using the SDK, you may want to call this in the event that a user logs out or deletes their account in your app. The user ID supplied to Appero is also cached, however for that we store it in UserDefaults. This allows us to persist the automatic UUID we generate to identify users for cases where a custom user ID has not been specified. We would recommend in most cases where you have an app with some kind of accounts feature, to use a common ID between your backend, Appero and any other analytics services to make it easier to manage your data and protect user privacy.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Getting Started
+Appero helps you capture user feedback at the right moments in your app journey. Built natively for Android with Kotlin
+and Jetpack Compose.
 
-The Appero SDK is based around a shared instance model that can be accessed from anywhere in your code once initialised. We recommend initialising Appero in the Application object.
+## Features
 
-You can then access the instance to access the SDK's functionality from anywhere in your app it makes sense.
+✅ **Automatic Feedback Prompts** - Smart triggers based on user experience
+✅ **Offline Support** - Queues experiences when offline, syncs automatically
+✅ **Native UI** - Built with Jetpack Compose, fully customizable themes
+✅ **WCAG 2.2 AA Compliant** - Accessible by default with proper contrast ratios
+✅ **Analytics Integration** - Easy integration with Firebase, GA4, and custom platforms
+✅ **Zero Dependencies** - Self-contained with Kotlin Coroutines and Ktor
+
+## Documentation
+
+📚 **Complete Documentation:**
+
+- **[Integration Guide](INTEGRATION.md)** - Detailed setup instructions
+- **[Troubleshooting](TROUBLESHOOTING.md)** - Common issues and solutions
+
+## Sample App
+
+Run the included sample app to see Appero in action:
+
+```bash
+# Clone the repository
+git clone https://github.com/pocketworks/appero-sdk-android.git
+
+# Open in Android Studio
+# Select :sample run configuration
+# Run on device or emulator
+```
+
+See [sample/README.md](sample/README.md) for details.
+
+## How It Works
+
+### Offline Support
+
+Appero caches experiences and feedback locally when the device is offline. The SDK automatically:
+
+- Stores data in a JSON file in your app's internal storage
+- Monitors network connectivity
+- Retries sending queued data every 3 minutes when online
+- Removes successfully sent items from the queue
+
+### Data Storage
+
+- **Experiences & Feedback:** JSON file in app's internal storage
+- **User ID:** SharedPreferences for persistence
+- **Privacy First:** No sensitive data sent to servers without your control
+
+We recommend using a consistent user ID across your backend, Appero, and analytics services for easier data management.
+
+### Getting Started
+
+The Appero SDK uses a singleton pattern accessible from anywhere in your code once initialized. We recommend
+initializing in your `Application` class's `onCreate()` method.
 
 ## Monitoring User Experience
 
-One of the core ideas in Appero is that we're tracking positive and negative user experiences. Once the number of experiences logged crosses the threshold defined on the Appero dashboard, we want to prompt the user to give us their feedback – be it positive or constructive. We call `log(experience: Experience, context: String)` to record individual experiences. The context string is used to categorise the experience and can be used to track outcomes of user flows, monitor for error states and so on.
+Appero tracks positive and negative user experiences. Once the number of experiences crosses defined thresholds, the SDK
+prompts users for feedback.
 
-Typical types of user experience you will want to add logging for are:
-* Completion of flows - positive if the user achieved what they wanted to or negative if they didn't.
-* In response to direct feedback requests (e.g. tapping thumbs up or down to a search result or suggestion to indicate its relevance)
-* Error states; you can determine the severity of these by considering if the error is temporary (network connection dropping) or more serious such as an error response from your server.
-* Starting or cancelling of subscriptions or in-app purchases
+### When to Log Experiences
 
-It's also possible to get creative, for example setting up a time threshold the user remains on a given screen to indicate positive behaviour if that's what we desire or negative if it indicates the inability to complete a task easily.
+Typical scenarios for logging experiences:
 
-__Important:__ We strongly recommend that you avoid sending sensitive user information in the context for experiences. This includes, but is not limited to, addresses, phone numbers, email addresses, banking and credit card details.
+**Positive Experiences (😄 / 🙂):**
 
-## Triggering the Appero Feedback UI
+- Successful completion of user flows
+- Feature usage that delights users
+- Smooth transactions or purchases
+- Positive responses to content
 
-Appero is built using Jetpack Compose and is very easy to integrate into your app, even if you're using XML-based layouts. To integrate with XML-based layouts, use the wrapper views provided in the Appero SDK.
+**Negative Experiences (😡 / 🙁):**
 
-The UI text is configurable through the Appero dashboard and can be configured separately for the negative and neutral/positive flows.
+- Failed operations or error states
+- Abandoned flows
+- Server errors or timeouts
+- User frustration indicators
 
-## Basic Themeing of the UI
+**Neutral Experiences (😐):**
 
-Appero by default uses the standard Material colours and responds to changes to the appearance as the rest of the system does, supporting light and dark mode. Appero also comes supplied with a light and dark theme, these both have a fixed colour palette that doesn't change in response to system appearance changes.
+- Completed but suboptimal flows
+- Feature discovery without engagement
+- Canceled operations
 
-You will likely wish to create your own theme so the Appero UI respects your app's branding.
- 
-## Connecting to 3rd Party Analytics
+### Example Usage
 
-If you want to capture people interacting with the Appero UI in your analytics, we allow setting an analytics delegate on Appero. Simply implement the `IApperoAnalytics` interface and override the required functions, when these events are triggered in the UI it can then make the appropriate calls to your analytic provider's SDK. 
+```kotlin
+// After successful purchase
+fun onPurchaseComplete() {
+    Appero.instance.log(
+        rating = ExperienceRating.POSITIVE,
+        detail = "Purchase completed successfully"
+    )
+}
 
-Set the delegate on the Appero shared instance somewhere sensible like after you've set your client and API keys.
+// After error
+fun onCheckoutError(error: Exception) {
+    Appero.instance.log(
+        rating = ExperienceRating.NEGATIVE,
+        detail = "Checkout failed: ${error.message}"
+    )
+}
+```
+
+**⚠️ Important:** Avoid logging sensitive information (addresses, phone numbers, emails, payment details) in the detail
+field.
+
+## Requirements
+
+- **Minimum SDK:** 24 (Android 7.0 / Nougat)
+- **Compile SDK:** 36
+- **Kotlin:** 2.0.21 or higher
+- **Compose BOM:** 2024.09.03 or higher
+
+## Architecture
+
+- **Language:** Kotlin with Coroutines
+- **UI Framework:** Jetpack Compose with Material 3
+- **Networking:** Ktor Client
+- **Serialization:** kotlinx.serialization
+- **State Management:** Kotlin StateFlow
+- **Storage:** JSON file + SharedPreferences
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## License
+
+MIT License - See [LICENSE](LICENSE) for details.
+
+## Support
+
+- **Documentation:** See links above
+- **Issues:** [GitHub Issues](https://github.com/pocketworks/appero-sdk-android/issues)
+- **Email:** support@appero.co.uk
+
+## Credits
+
+Developed by [Pocketworks Mobile](https://pocketworks.co.uk)
+
+---
+
+**Made with ❤️ for Android developers**
 

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Header -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:text="@string/app_title"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium" />
+
+        <!-- Theme Selection Section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="@string/theme_selection_title"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/themeToggleGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            app:checkedButton="@id/btnThemeSystem"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnThemeSystem"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="48dp"
+                android:text="@string/theme_system" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnThemeCustom1"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="48dp"
+                android:text="@string/theme_custom_1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnThemeCustom2"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="48dp"
+                android:text="@string/theme_custom_2" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <!-- Rating Buttons -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRatingVeryPositive"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/rating_very_positive_bg"
+            android:minHeight="56dp"
+            android:text="@string/btn_rating_very_positive"
+            android:textColor="@color/rating_text"
+            app:icon="@drawable/ic_thumbs_up_double"
+            app:iconTint="@color/rating_text"
+            app:iconGravity="start"
+            android:textSize="16sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRatingPositive"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/rating_positive_bg"
+            android:minHeight="56dp"
+            android:text="@string/btn_rating_positive"
+            android:textColor="@color/rating_text"
+            app:icon="@drawable/ic_thumb_up_single"
+            app:iconTint="@color/rating_text"
+            app:iconGravity="start"
+            android:textSize="16sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRatingNeutral"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/rating_neutral_bg"
+            android:minHeight="56dp"
+            android:text="@string/btn_rating_neutral"
+            android:textColor="@color/rating_text"
+            app:icon="@drawable/ic_thumbs_up_down"
+            app:iconTint="@color/rating_text"
+            app:iconGravity="start"
+            android:textSize="16sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRatingNegative"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/rating_negative_bg"
+            android:minHeight="56dp"
+            android:text="@string/btn_rating_negative"
+            android:textColor="@color/rating_text"
+            app:icon="@drawable/ic_thumb_down_single"
+            app:iconTint="@color/rating_text"
+            app:iconGravity="start"
+            android:textSize="16sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRatingVeryNegative"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:backgroundTint="@color/rating_very_negative_bg"
+            android:minHeight="56dp"
+            android:text="@string/btn_rating_very_negative"
+            android:textColor="@color/rating_text"
+            app:icon="@drawable/ic_thumbs_down_double"
+            app:iconTint="@color/rating_text"
+            app:iconGravity="start"
+            android:textSize="16sp" />
+
+        <!-- Trigger Feedback Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTriggerPrompt"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:textColor="@color/rating_text"
+            android:minHeight="56dp"
+            android:textSize="16sp"
+            android:text="@string/btn_trigger_prompt" />
+
+    </LinearLayout>
+</ScrollView>

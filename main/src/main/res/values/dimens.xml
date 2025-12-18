@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Shape corner radii -->
+    <dimen name="appero_shape_corner_small">8dp</dimen>
+    <dimen name="appero_shape_corner_medium">12dp</dimen>
+    <dimen name="appero_shape_corner_large">28dp</dimen>
+
+    <!-- Circle shape uses 50% for fully rounded corners -->
+    <integer name="appero_shape_corner_circle_percent">50</integer>
+</resources>

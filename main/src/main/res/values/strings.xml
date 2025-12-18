@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Interactive element labels (WCAG: descriptive labels) -->
+    <string name="appero_close">Close feedback</string>
+    <string name="appero_send_feedback">Send feedback</string>
+    <string name="appero_done">Done</string>
+
+    <!-- Default UI strings -->
+    <string name="default_ui_title">Thanks for using our app!</string>
+    <string name="default_ui_subtitle">Please let us know how we\'re doing</string>
+    <string name="default_ui_prompt">Share your thoughts here</string>
+
+    <!-- Flow-specific questions -->
+    <string name="appero_question_positive">What made your experience positive?</string>
+    <string name="appero_question_negative">We\'re sorry you\'re not enjoying it. Could you tell us what went wrong?</string>
+
+    <!-- Thank you screen -->
+    <string name="appero_thank_you_title">Thank you!</string>
+    <string name="appero_thank_you_message">Your feedback helps us improve your experience.</string>
+
+    <!-- WCAG: Content descriptions (detailed for screen readers) -->
+    <string name="appero_rating_1_desc">Very dissatisfied, rate 1 out of 5</string>
+    <string name="appero_rating_2_desc">Dissatisfied, rate 2 out of 5</string>
+    <string name="appero_rating_3_desc">Neutral, rate 3 out of 5</string>
+    <string name="appero_rating_4_desc">Satisfied, rate 4 out of 5</string>
+    <string name="appero_rating_5_desc">Very satisfied, rate 5 out of 5</string>
+    <string name="appero_rating_selected_desc">Selected rating: %s</string>
+    <string name="appero_character_count">%1$d of %2$d characters used</string>
+
+    <!-- WCAG: State announcements -->
+    <string name="appero_submitting">Submitting feedback</string>
+    <string name="appero_submitted">Feedback submitted successfully</string>
+    <string name="appero_error">Error submitting feedback. Please try again.</string>
+
+    <!-- Additional accessibility labels -->
+    <string name="appero_rating_group_label">Rate your experience from 1 to 5</string>
+</resources>

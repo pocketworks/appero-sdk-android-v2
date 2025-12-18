@@ -1,0 +1,239 @@
+//
+//  FeedbackInputScreen.kt
+//  Appero SDK
+//
+//  MIT License
+//
+//  Copyright (c) 2024 Pocketworks Mobile
+//
+
+package uk.co.pocketworks.appero.sdk.main.ui.screens
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import uk.co.pocketworks.appero.sdk.main.R
+import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
+import uk.co.pocketworks.appero.sdk.main.ui.components.FeedbackTextField
+import uk.co.pocketworks.appero.sdk.main.ui.components.RatingSelector
+import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoThemeProvider
+import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
+
+/**
+ * Feedback input screen.
+ *
+ * Displays after user selects a rating:
+ * - Close button (X) in top-right corner
+ * - Title and subtitle
+ * - Selected rating (read-only, others desaturated)
+ * - Dynamic question based on rating (positive/negative)
+ * - Multi-line text input field with character counter
+ * - "Send feedback" button with loading state
+ *
+ * WCAG Compliance:
+ * - Scrollable for text scaling up to 200%
+ * - Button minimum 48dp height
+ * - Loading state announced to screen readers
+ * - Proper heading hierarchy
+ *
+ * @param title Main heading text
+ * @param subtitle Secondary text
+ * @param feedbackHint Hint displayed in the feedback input field
+ * @param selectedRating The rating user selected
+ * @param question Dynamic question based on rating
+ * @param feedbackText Current feedback text value
+ * @param onRatingSelected Callback when a rating is selected
+ * @param showRatings Whether to show rating icons
+ * @param onFeedbackTextChange Callback when feedback text changes
+ * @param onSendFeedback Callback when send button is tapped
+ * @param isSubmitting Whether feedback is currently being submitted
+ * @param modifier Optional modifier
+ */
+@Composable
+fun FeedbackInputScreen(
+    title: String,
+    subtitle: String,
+    feedbackHint: String,
+    selectedRating: ExperienceRating?,
+    question: String,
+    feedbackText: String,
+    showRatings: Boolean,
+    onFeedbackTextChange: (String) -> Unit,
+    onRatingSelected: (ExperienceRating) -> Unit,
+    onSendFeedback: () -> Unit,
+    isSubmitting: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val theme = localApperoTheme.current
+
+    Column(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        // Title
+        Text(
+            text = title,
+            style = theme.typography.titleLarge,
+            color = theme.colors.onSurface,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .semantics { heading() }
+                .align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Subtitle
+        Text(
+            text = subtitle,
+            style = theme.typography.bodyMedium,
+            color = theme.colors.onSurfaceVariant,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Show selected rating (read-only)
+        if (showRatings) {
+            RatingSelector(
+                selectedRating = selectedRating,
+                onRatingSelected = onRatingSelected,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Dynamic question
+            Text(
+                text = question,
+                style = theme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                color = theme.colors.onSurfaceVariant,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Feedback text field
+        FeedbackTextField(
+            value = feedbackText,
+            onValueChange = onFeedbackTextChange,
+            tall = !showRatings,
+            placeholder = feedbackHint
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Resolve string for accessibility announcement
+        val submittingText = stringResource(R.string.appero_submitting)
+
+        // WCAG: Button with 48dp minimum height, loading state announced
+        Button(
+            onClick = onSendFeedback,
+            enabled = !isSubmitting,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp) // WCAG: Minimum touch target height
+                .semantics {
+                    if (isSubmitting) {
+                        stateDescription = submittingText
+                    }
+                },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = theme.colors.primary,
+                contentColor = theme.colors.onPrimary
+            ),
+            shape = theme.shapes.medium
+        ) {
+            if (isSubmitting) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    color = theme.colors.onPrimary,
+                    strokeWidth = 2.dp
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+            Text(
+                text = stringResource(R.string.appero_send_feedback),
+                style = theme.typography.labelLarge
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FeedbackInputScreenPositivePreview() {
+    ApperoThemeProvider {
+        FeedbackInputScreen(
+            title = "We're happy to see that you're using Carbs & Cals 🎉",
+            subtitle = "Let us know how we're doing",
+            feedbackHint = "Share what you think",
+            selectedRating = ExperienceRating.POSITIVE,
+            question = "What made your experience positive?",
+            showRatings = true,
+            feedbackText = "",
+            onFeedbackTextChange = {},
+            onRatingSelected = {},
+            onSendFeedback = {},
+            isSubmitting = false,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FeedbackInputScreenNegativePreview() {
+    ApperoThemeProvider {
+        FeedbackInputScreen(
+            title = "We're happy to see that you're using Carbs & Cals 🎉",
+            subtitle = "Let us know how we're doing",
+            feedbackHint = "Share what you think",
+            selectedRating = ExperienceRating.NEGATIVE,
+            question = "We're sorry you're not enjoying it. Could you tell us what went wrong?",
+            showRatings = false,
+            feedbackText = "The search feature is not working properly.",
+            onFeedbackTextChange = {},
+            onRatingSelected = {},
+            onSendFeedback = {},
+            isSubmitting = false,
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:Nexus S")
+@Composable
+private fun FeedbackInputScreenLoadingPreview() {
+    ApperoThemeProvider {
+        FeedbackInputScreen(
+            title = "We're happy to see that you're using Carbs & Cals 🎉",
+            subtitle = "Let us know how we're doing",
+            feedbackHint = "Share you thoughts here",
+            selectedRating = ExperienceRating.STRONG_POSITIVE,
+            question = "What made your experience positive?",
+            showRatings = true,
+            feedbackText = "Love the barcode scanner feature!",
+            onFeedbackTextChange = {},
+            onSendFeedback = {},
+            onRatingSelected = {},
+            isSubmitting = true,
+        )
+    }
+}

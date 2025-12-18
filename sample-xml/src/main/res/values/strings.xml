@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Appero XML Demo</string>
+    <string name="app_title">Appero SDK Demo</string>
+
+    <!-- Theme Selection -->
+    <string name="theme_selection_title">Appero UI theme:</string>
+    <string name="theme_system">System</string>
+    <string name="theme_custom_1">Theme 1</string>
+    <string name="theme_custom_2">Theme 2</string>
+
+    <!-- Ratings -->
+    <string name="btn_rating_very_positive">Very Positive</string>
+    <string name="btn_rating_positive">Positive</string>
+    <string name="btn_rating_neutral">Neutral</string>
+    <string name="btn_rating_negative">Negative</string>
+    <string name="btn_rating_very_negative">Very Negative</string>
+
+    <!-- Feedback -->
+    <string name="btn_trigger_prompt">Manually Trigger Feedback</string>
+</resources>

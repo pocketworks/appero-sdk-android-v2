@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Rating button background colors -->
+    <color name="rating_very_positive_bg">#FFD4F4DD</color>
+    <color name="rating_positive_bg">#FFE8F5E9</color>
+    <color name="rating_neutral_bg">#FFFFF3E0</color>
+    <color name="rating_negative_bg">#FFFFEBEE</color>
+    <color name="rating_very_negative_bg">#FFFFCDD2</color>
+
+    <!-- Rating button text colors -->
+    <color name="rating_text">#1976D2</color>
+</resources>

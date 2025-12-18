@@ -183,7 +183,7 @@ fun FeedbackInputScreen(
 private fun FeedbackInputScreenPositivePreview() {
     ApperoThemeProvider {
         FeedbackInputScreen(
-            title = "We're happy to see that you're using Carbs & Cals 🎉",
+            title = "We're happy to see that you're using our app 🎉",
             subtitle = "Let us know how we're doing",
             feedbackHint = "Share what you think",
             selectedRating = ExperienceRating.POSITIVE,
@@ -203,7 +203,7 @@ private fun FeedbackInputScreenPositivePreview() {
 private fun FeedbackInputScreenNegativePreview() {
     ApperoThemeProvider {
         FeedbackInputScreen(
-            title = "We're happy to see that you're using Carbs & Cals 🎉",
+            title = "We're happy to see that you're using our app 🎉",
             subtitle = "Let us know how we're doing",
             feedbackHint = "Share what you think",
             selectedRating = ExperienceRating.NEGATIVE,
@@ -223,7 +223,7 @@ private fun FeedbackInputScreenNegativePreview() {
 private fun FeedbackInputScreenLoadingPreview() {
     ApperoThemeProvider {
         FeedbackInputScreen(
-            title = "We're happy to see that you're using Carbs & Cals 🎉",
+            title = "We're happy to see that you're using our app 🎉",
             subtitle = "Let us know how we're doing",
             feedbackHint = "Share you thoughts here",
             selectedRating = ExperienceRating.STRONG_POSITIVE,

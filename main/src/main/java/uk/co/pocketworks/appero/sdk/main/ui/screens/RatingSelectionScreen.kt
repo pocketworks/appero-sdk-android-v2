@@ -96,7 +96,7 @@ fun RatingSelectionScreen(
 private fun RatingSelectionScreenPreview() {
     ApperoThemeProvider {
         RatingSelectionScreen(
-            title = "We're happy to see that you're using Carbs & Cals 🎉",
+            title = "We're happy to see that you're using our app 🎉",
             subtitle = "Let us know how we're doing",
             selectedRating = null,
             onRatingSelected = {},
@@ -109,7 +109,7 @@ private fun RatingSelectionScreenPreview() {
 private fun RatingSelectionScreenSelectedPreview() {
     ApperoThemeProvider {
         RatingSelectionScreen(
-            title = "We're happy to see that you're using Carbs & Cals 🎉",
+            title = "We're happy to see that you're using our app 🎉",
             subtitle = "Let us know how we're doing",
             selectedRating = ExperienceRating.NEUTRAL,
             onRatingSelected = {},

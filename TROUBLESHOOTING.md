@@ -46,15 +46,7 @@ Solutions to common issues when integrating the Appero SDK.
    ```
 
 3. **Rating threshold not met**
-   - Need 3+ positive ratings (4-5) OR
-   - 1 negative rating (1-2)
-
-   ```kotlin
-   // Force trigger for testing
-   repeat(3) {
-       Appero.instance.log(ExperienceRating.POSITIVE)
-   }
-   ```
+   - review the "Experience Threshold" setting in the Appero dashboard
 
 4. **Application class not registered**
    ```xml
@@ -67,44 +59,18 @@ Solutions to common issues when integrating the Appero SDK.
 
 ---
 
-### Feedback UI Disappears Immediately
-
-**Problem:** Feedback UI flashes and disappears.
-
-**Solution:** Don't dismiss prompt in the same frame it appears.
-
-```kotlin
-// ❌ Wrong
-LaunchedEffect(shouldShow) {
-    if (shouldShow) {
-        Appero.instance.dismissApperoPrompt()
-    }
-}
-
-// ✅ Correct - Let user dismiss naturally
-if (shouldShow) {
-    ApperoFeedbackUI() // Handles dismissal internally
-}
-```
-
----
-
 ### User ID Not Set
 
 **Problem:** Experiences logged but userId is null.
 
-**Solution:** Set userId before or after initialization.
+**Solution:** Set userId at initialization.
 
 ```kotlin
-// Option 1: During initialization
 Appero.instance.start(
     context = this,
     apiKey = "API_KEY",
     userId = "user_123"
 )
-
-// Option 2: Set later
-Appero.instance.userId = getCurrentUserId()
 ```
 
 ---
@@ -124,12 +90,13 @@ object MyTheme : ApperoTheme {
         primary = Color(0xFF6200EE),
         // ... your brand colors
     )
-    override val typography = ApperoTypography()
+    override val typography = DefaultApperoTypography()
     override val shapes = ApperoShapes()
+    override val ratingImages = DefaultApperoRatingImages()
 }
 
 // Apply custom theme
-ApperoFeedbackUI(customTheme = MyTheme)
+ApperoFeedbackBottomSheet(customTheme = MyTheme)
 ```
 
 ---
@@ -138,13 +105,12 @@ ApperoFeedbackUI(customTheme = MyTheme)
 
 **Problem:** Can't close the feedback UI.
 
-**Solution:** Ensure you're using `ApperoFeedbackUI` which handles dismissal automatically.
+**Solution:** Ensure you're using `ApperoFeedbackBottomSheet` which handles dismissal automatically.
 
 ```kotlin
 // ✅ Handles dismissal internally
-if (shouldShow) {
-    ApperoFeedbackUI()
-}
+ApperoFeedbackBottomSheet()
+
 
 // If using custom implementation, observe dismissal:
 LaunchedEffect(shouldShow) {
@@ -203,11 +169,10 @@ Appero.instance.start(
 
 **Possible Causes & Solutions:**
 
-1. **No internet permission**
-   ```xml
-   <!-- Add to AndroidManifest.xml -->
-   <uses-permission android:name="android.permission.INTERNET" />
-   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+1. **Invalid API Key**
+   - make sure you have set the correct API key in 
+   ```kotlin
+   Appero.instance.start(context, apiKey)
    ```
 
 2. **Device is offline**
@@ -256,7 +221,7 @@ Appero.instance.log(ExperienceRating.POSITIVE)
 
 ```kotlin
 // Built-in themes are WCAG 2.2 AA compliant
-ApperoFeedbackUI(customTheme = LightApperoTheme)
+ApperoFeedbackBottomSheet(customTheme = LightApperoTheme)
 
 // For custom themes, verify contrast at:
 // https://webaim.org/resources/contrastchecker/
@@ -279,12 +244,7 @@ ApperoFeedbackUI(customTheme = LightApperoTheme)
 @Composable
 fun MyScreen() {
     val isDark = isSystemInDarkTheme()
-    val shouldShow by Appero.instance.shouldShowFeedbackPrompt.collectAsState()
-
-    if (shouldShow) {
-        val theme = if (isDark) DarkApperoTheme else LightApperoTheme
-        ApperoFeedbackUI(customTheme = theme)
-    }
+    ApperoFeedbackBottomSheet(customTheme = if (isDark) DarkApperoTheme else LightApperoTheme)
 }
 ```
 
@@ -313,15 +273,10 @@ object MyTheme : ApperoTheme {
         background = Color.White,
         surface = Color.White,
         onSurface = Color.Black,
-        onSurfaceVariant = Color.Gray,
-        rating1 = Color(0xFFD64545),
-        rating2 = Color(0xFFE87E3C),
-        rating3 = Color(0xFFC99A1F),
-        rating4 = Color(0xFF4A9E4E),
-        rating5 = Color(0xFF3D8B41)
     )
-    override val typography = ApperoTypography()
+    override val typography = DefaultApperoTypography()
     override val shapes = ApperoShapes()
+    override val ratingImages = DefaultApperoRatingImages()
 }
 ```
 
@@ -340,7 +295,7 @@ object MyTheme : ApperoTheme {
 dependencies {
     implementation(project(":main")) // If local module
     // OR
-    implementation("uk.co.pocketworks:appero-sdk:1.0.0") // If from Maven
+    implementation("uk.co.pocketworks.appero:sdk-android:<latest-version>") // If from Maven
 }
 ```
 
@@ -486,51 +441,6 @@ fun testOfflineQueueing() {
 
 ---
 
-## Performance Issues
-
-### UI Lags When Showing Feedback
-
-**Problem:** Janky animation when feedback UI appears.
-
-**Solution:** Ensure you're using `rememberSaveable` for state.
-
-```kotlin
-@Composable
-fun MyScreen() {
-    val shouldShow by Appero.instance.shouldShowFeedbackPrompt.collectAsState()
-
-    // Use Box to layer content
-    Box {
-        // Main content (always rendered)
-        MyContent()
-
-        // Feedback overlay (conditional)
-        if (shouldShow) {
-            ApperoFeedbackUI()
-        }
-    }
-}
-```
-
----
-
-### High Memory Usage
-
-**Problem:** App uses more memory after integrating SDK.
-
-**Solution:** SDK is designed to be lightweight. Verify you're not creating multiple instances:
-
-```kotlin
-// ❌ Don't create copies
-val appero1 = Appero.instance
-val appero2 = Appero.instance // Same instance
-
-// ✅ Use singleton
-Appero.instance.log(...)
-```
-
----
-
 ## Debug Tips
 
 ### Enable Debug Logging
@@ -551,32 +461,6 @@ Appero.instance.start(
 - Queue processing
 - Experience logging
 - Errors and warnings
-
----
-
-### Check Local Storage
-
-SDK stores data in: `{app_internal_storage}/ApperoData.json`
-
-```kotlin
-// Access file location
-val file = File(context.filesDir, "ApperoData.json")
-val data = file.readText()
-println("Stored data: $data")
-```
-
----
-
-### Verify StateFlow Updates
-
-```kotlin
-// Collect all state updates for debugging
-lifecycleScope.launch {
-    Appero.instance.shouldShowFeedbackPrompt.collect { value ->
-        Log.d("Appero", "Feedback prompt state: $value")
-    }
-}
-```
 
 ---
 
@@ -601,7 +485,7 @@ If your issue isn't covered here:
      - Debug logs
 
 4. **Sample App:**
-   - Run the `:sample` module
+   - Run the `:sample-compose` module
    - Compare with your implementation
 
 ---

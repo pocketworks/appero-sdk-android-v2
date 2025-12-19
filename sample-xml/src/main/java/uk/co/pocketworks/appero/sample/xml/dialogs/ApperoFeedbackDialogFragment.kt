@@ -27,7 +27,7 @@ import uk.co.pocketworks.appero.sample.xml.components.ThemeHolder
 import uk.co.pocketworks.appero.sdk.main.Appero
 import uk.co.pocketworks.appero.sdk.main.ui.theme.DarkApperoTheme
 import uk.co.pocketworks.appero.sdk.main.ui.theme.LightApperoTheme
-import uk.co.pocketworks.appero.sdk.main.ui.xml.ApperoFeedbackComposeView
+import uk.co.pocketworks.appero.sdk.main.ui.ApperoFeedbackComposeView
 
 /**
  * BottomSheetDialogFragment that showcases ApperoFeedbackComposeView integration

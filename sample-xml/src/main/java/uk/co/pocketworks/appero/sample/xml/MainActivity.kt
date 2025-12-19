@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity() {
      * Observe Appero SDK's shouldShowFeedbackPrompt StateFlow.
      *
      * Automatically shows/dismisses the DialogFragment when the StateFlow changes.
-     * This mirrors how ApperoFeedbackUI() works in the Compose sample app.
+     * This mirrors how ApperoFeedbackBottomSheet() works in the Compose sample app.
      *
      * Uses lifecycle-aware collection to prevent leaks and ensure proper
      * state management across configuration changes.

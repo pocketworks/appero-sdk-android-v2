@@ -1,13 +1,4 @@
-//
-//  ApperoFeedbackComposeView.kt
-//  Appero SDK
-//
-//  MIT License
-//
-//  Copyright (c) 2025 Pocketworks Mobile
-//
-
-package uk.co.pocketworks.appero.sdk.main.ui.xml
+package uk.co.pocketworks.appero.sdk.main.ui
 
 import android.content.Context
 import android.util.AttributeSet
@@ -19,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.unit.dp
 import uk.co.pocketworks.appero.sdk.main.Appero
-import uk.co.pocketworks.appero.sdk.main.ui.ApperoFeedbackContent
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoTheme
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoThemeProvider
 import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
@@ -88,19 +78,19 @@ class ApperoFeedbackComposeView @JvmOverloads constructor(
      * Optional custom Appero instance.
      * Defaults to Appero.instance singleton.
      */
-    var apperoInstance: Appero = Appero.instance
+    var apperoInstance: Appero = Appero.Companion.instance
 
     @Composable
     override fun Content() {
         ApperoThemeProvider(theme) {
             Surface(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.Companion.fillMaxWidth(),
                 color = localApperoTheme.current.colors.surface,
             ) {
                 ApperoFeedbackContent(
                     apperoInstance = apperoInstance,
                     onDismiss = { apperoInstance.dismissApperoPrompt() },
-                    modifier = Modifier.padding(
+                    modifier = Modifier.Companion.padding(
                         start = 24.dp,
                         top = 12.dp,
                         end = 24.dp,

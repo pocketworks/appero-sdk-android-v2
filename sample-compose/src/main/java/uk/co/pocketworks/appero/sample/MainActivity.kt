@@ -23,7 +23,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,7 +70,6 @@ class MainActivity : FragmentActivity() {
 @Composable
 fun SampleApp() {
     var selectedTheme by remember { mutableStateOf(ThemeMode.SYSTEM) }
-    val shouldShowFeedback by Appero.instance.shouldShowFeedbackPrompt.collectAsState()
 
     Box(
         modifier = Modifier
@@ -186,14 +184,12 @@ fun SampleApp() {
         }
 
         // Appero Feedback UI
-        if (shouldShowFeedback) {
-            val theme = when (selectedTheme) {
+        ApperoFeedbackBottomSheet(
+            customTheme = when (selectedTheme) {
                 ThemeMode.CUSTOM_1 -> CustomTheme1
                 ThemeMode.CUSTOM_2 -> customTheme2(LocalContext.current)
                 ThemeMode.SYSTEM -> null // Use default Material 3 theme
             }
-
-            ApperoFeedbackBottomSheet(customTheme = theme)
-        }
+        )
     }
 }

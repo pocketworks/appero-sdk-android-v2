@@ -25,47 +25,52 @@ and Jetpack Compose.
 
 ## Sample App
 
-Run the included sample app to see Appero in action:
+Run the included sample apps to see Appero in action:
 
 ```bash
 # Clone the repository
-git clone https://github.com/pocketworks/appero-sdk-android.git
+git clone https://github.com/pocketworks/appero-sdk-android-v2.git
 
 # Open in Android Studio
-# Select :sample run configuration
+# Select :sample-compose or :sample-xml run configuration
 # Run on device or emulator
 ```
 
 See [sample/README.md](sample/README.md) for details.
 
-## How It Works
+## Core Concepts
+
+### Experience Logging
+
+The SDK tracks user experiences and automatically determines when to show a feedback prompt based on the
+Experience Threshold set in the Appero Dashboard.
+
+### Feedback Flows
+
+Three distinct flows based on user sentiment:
+- **Positive Flow:** Thank you message, optional text feedback
+- **Neutral Flow:** Asks what could be improved
+- **Negative Flow:** Apologizes, asks what went wrong
 
 ### Offline Support
 
-Appero caches experiences and feedback locally when the device is offline. The SDK automatically:
+The SDK handles offline scenarios gracefully:
+- Experiences logged while offline are queued locally
+- Automatic retry every 3 minutes when online
+- Network state monitoring with reconnection handling
+- JSON file storage in app's internal storage (shared preferences)
 
-- Stores data in a JSON file in your app's internal storage
-- Monitors network connectivity
-- Retries sending queued data every 3 minutes when online
-- Removes successfully sent items from the queue
-
-### Data Storage
-
-- **Experiences & Feedback:** JSON file in app's internal storage
-- **User ID:** SharedPreferences for persistence
-- **Privacy First:** No sensitive data sent to servers without your control
-
-We recommend using a consistent user ID across your backend, Appero, and analytics services for easier data management.
+### Rating Options
+- `ExperienceRating.STRONG_POSITIVE` (5) - 😄 Very satisfied
+- `ExperienceRating.POSITIVE` (4) - 🙂 Satisfied
+- `ExperienceRating.NEUTRAL` (3) - 😐 Neutral
+- `ExperienceRating.NEGATIVE` (2) - 🙁 Dissatisfied
+- `ExperienceRating.STRONG_NEGATIVE` (1) - 😡 Very dissatisfied
 
 ### Getting Started
 
 The Appero SDK uses a singleton pattern accessible from anywhere in your code once initialized. We recommend
 initializing in your `Application` class's `onCreate()` method.
-
-## Monitoring User Experience
-
-Appero tracks positive and negative user experiences. Once the number of experiences crosses defined thresholds, the SDK
-prompts users for feedback.
 
 ### When to Log Experiences
 

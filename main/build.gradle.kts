@@ -44,6 +44,13 @@ android {
         buildConfigField("String", "SDK_VERSION", "\"${versionName}\"")
     }
 
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+            isIncludeAndroidResources = true
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -105,9 +112,15 @@ dependencies {
     detektPlugins(libs.detekt.formatting)
 
     testImplementation(libs.junit)
+    testImplementation(kotlin("test"))
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    testImplementation(kotlin("test"))
 }
 
 // Maven Publishing Configuration

@@ -10,10 +10,12 @@
 package uk.co.pocketworks.appero.sdk.main
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -107,6 +109,14 @@ class Appero private constructor() : LifecycleEventObserver {
      * Optional delegate for analytics integration.
      */
     var analyticsDelegate: IApperoAnalytics? = null
+
+    /**
+     * Coroutine dispatcher for background operations.
+     * Defaults to Dispatchers.IO in production.
+     * Can be overridden for testing purposes.
+     */
+    @VisibleForTesting
+    internal var backgroundDispatcher: CoroutineDispatcher = Dispatchers.IO
 
     // Internal mutable StateFlows
     private val shouldShowFeedbackPromptState = MutableStateFlow(false)
@@ -318,7 +328,7 @@ class Appero private constructor() : LifecycleEventObserver {
             detail = detail
         )
 
-        scope.launch(Dispatchers.IO) {
+        scope.launch(backgroundDispatcher) {
             postExperience(experienceRecord)
         }
     }

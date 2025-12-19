@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import uk.co.pocketworks.appero.sdk.main.analytics.IApperoAnalytics
 import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIClient
 import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIError
@@ -428,12 +427,8 @@ class Appero private constructor() : LifecycleEventObserver {
             item = experience,
             queueAction = ::queueExperience,
             onSuccess = { responseBytes ->
-                try {
-                    val json = Json { ignoreUnknownKeys = true }
-                    val response = json.decodeFromString<ExperienceResponse>(responseBytes.decodeToString())
-                    handleExperienceResponse(response)
-                } catch (e: Exception) {
-                    ApperoLogger.log("Failed to parse experience response: ${e.message}")
+                ExperienceResponse.fromBytes(responseBytes)?.let {
+                    handleExperienceResponse(it)
                 }
             }
         )

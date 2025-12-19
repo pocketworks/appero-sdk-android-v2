@@ -4,7 +4,7 @@
 //
 //  MIT License
 //
-//  Copyright (c) 2024 Pocketworks Mobile
+//  Copyright (c) 2025 Pocketworks Mobile
 //
 
 package uk.co.pocketworks.appero.sdk.main.ui
@@ -39,7 +39,7 @@ import uk.co.pocketworks.appero.sdk.main.ui.screens.ThankYouScreen
  *
  * This composable contains all flow logic and state management but does NOT
  * include modal presentation (ModalBottomSheet, Dialog, etc.). Wrappers like
- * [ApperoFeedbackBottomSheet] or [ApperoFeedbackComposeView] handle presentation.
+ * [ApperoFeedbackBottomSheet] or [uk.co.pocketworks.appero.sdk.main.ui.xml.ApperoFeedbackComposeView] handle presentation.
  *
  * **Usage in ModalBottomSheet:**
  * ```kotlin

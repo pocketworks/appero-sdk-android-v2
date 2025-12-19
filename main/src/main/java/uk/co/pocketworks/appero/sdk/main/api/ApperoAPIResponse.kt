@@ -4,7 +4,7 @@
 //
 //  MIT License
 //
-//  Copyright (c) 2024 Pocketworks Mobile
+//  Copyright (c) 2025 Pocketworks Mobile
 //
 
 package uk.co.pocketworks.appero.sdk.main.api

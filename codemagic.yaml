@@ -20,9 +20,37 @@ workflows:
       - name: Run detekt
         script: |
           ./gradlew detekt
+        ignore_failure: false
       - name: Run tests
         script: |
           ./gradlew :main:testDebugUnitTest
+        ignore_failure: false
     artifacts:
-      - build/**/reports/detekt/detekt.html
-      - build/**/reports/tests/testDebugUnitTest/index.html
+      - main/build/reports/detekt/detekt.html
+      - main/build/reports/tests/testDebugUnitTest/index.html
+  publish-to-maven:
+    name: Publish to Maven Central
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      java: 17
+      groups:
+        - MAVEN_PUBLISH
+    scripts:
+      - name: Set up local properties
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Run detekt
+        script: |
+          ./gradlew detekt
+        ignore_failure: false
+      - name: Run tests
+        script: |
+          ./gradlew :main:testDebugUnitTest
+        ignore_failure: false
+      - name: Publish to Maven
+        script: |
+          ./gradlew :main:publishToMavenLocal
+    artifacts:
+      - main/build/reports/detekt/detekt.html
+      - main/build/reports/tests/testDebugUnitTest/index.html

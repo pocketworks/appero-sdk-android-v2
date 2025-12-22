@@ -50,7 +50,7 @@ workflows:
         ignore_failure: false
       - name: Publish to Maven
         script: |
-          ./gradlew :main:publishToMavenLocal
+          ./gradlew :main:publishToMavenCentral
     artifacts:
       - main/build/reports/detekt/detekt.html
       - main/build/reports/tests/testDebugUnitTest/index.html

@@ -9,7 +9,6 @@
 
 package uk.co.pocketworks.appero.sdk.main.ui.theme
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource

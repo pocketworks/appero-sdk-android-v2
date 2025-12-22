@@ -11,15 +11,19 @@ package uk.co.pocketworks.appero.sdk.main
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import app.cash.turbine.test
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockkObject
 import io.mockk.unmockkAll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -41,13 +45,6 @@ import uk.co.pocketworks.appero.sdk.main.storage.UserPreferencesStorage
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import app.cash.turbine.test
-import io.mockk.coVerify
-import io.mockk.verify
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 /**
  * Unit tests for Appero class.
@@ -296,7 +293,8 @@ class ApperoTest {
         // Set the isConnectedState to true using reflection
         val isConnectedStateField = NetworkMonitor::class.java.getDeclaredField("isConnectedState")
         isConnectedStateField.isAccessible = true
-        val isConnectedState = isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
+        val isConnectedState =
+            isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
         isConnectedState.value = true
 
         // Clear any existing data to ensure clean state
@@ -337,7 +335,6 @@ class ApperoTest {
 
         // When
         appero.log(ExperienceRating.POSITIVE, "Offline experience")
-
 
         // Then - No API call should be made
         coVerify(exactly = 0) {
@@ -382,7 +379,6 @@ class ApperoTest {
         ratings.forEach { (rating, expectedValue) ->
             // When
             appero.log(rating, "Test ${rating.name}")
-    
 
             // Then - Verify the rating value is correct
             assertEquals(expectedValue, rating.value)
@@ -410,7 +406,8 @@ class ApperoTest {
 
         val isConnectedStateField = NetworkMonitor::class.java.getDeclaredField("isConnectedState")
         isConnectedStateField.isAccessible = true
-        val isConnectedState = isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
+        val isConnectedState =
+            isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
         isConnectedState.value = true
 
         // When
@@ -443,7 +440,8 @@ class ApperoTest {
 
         val isConnectedStateField = NetworkMonitor::class.java.getDeclaredField("isConnectedState")
         isConnectedStateField.isAccessible = true
-        val isConnectedState = isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
+        val isConnectedState =
+            isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
         isConnectedState.value = true
 
         // When
@@ -492,12 +490,12 @@ class ApperoTest {
 
         val isConnectedStateField = NetworkMonitor::class.java.getDeclaredField("isConnectedState")
         isConnectedStateField.isAccessible = true
-        val isConnectedState = isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
+        val isConnectedState =
+            isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
         isConnectedState.value = true
 
         // When
         appero.log(ExperienceRating.POSITIVE)
-
 
         // Then
         assertEquals(true, appero.shouldShowFeedbackPrompt.value)
@@ -545,12 +543,12 @@ class ApperoTest {
 
         val isConnectedStateField = NetworkMonitor::class.java.getDeclaredField("isConnectedState")
         isConnectedStateField.isAccessible = true
-        val isConnectedState = isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
+        val isConnectedState =
+            isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
         isConnectedState.value = true
 
         // When
         appero.log(ExperienceRating.POSITIVE)
-
 
         // Then
         assertEquals(customStrings, appero.feedbackUIStrings.value)
@@ -593,12 +591,12 @@ class ApperoTest {
 
         val isConnectedStateField = NetworkMonitor::class.java.getDeclaredField("isConnectedState")
         isConnectedStateField.isAccessible = true
-        val isConnectedState = isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
+        val isConnectedState =
+            isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
         isConnectedState.value = true
 
         // When
         appero.log(ExperienceRating.NEGATIVE)
-
 
         // Then
         assertEquals(FlowType.NEGATIVE, appero.flowType.value)
@@ -629,7 +627,6 @@ class ApperoTest {
 
         // When
         appero.log(ExperienceRating.POSITIVE, "Error test")
-
 
         // Then - Verify experience was queued
         val dataStorage = ApperoDataStorage(context)
@@ -693,7 +690,8 @@ class ApperoTest {
 
         val isConnectedStateField = NetworkMonitor::class.java.getDeclaredField("isConnectedState")
         isConnectedStateField.isAccessible = true
-        val isConnectedState = isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
+        val isConnectedState =
+            isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
         isConnectedState.value = true
 
         // When
@@ -702,7 +700,6 @@ class ApperoTest {
             assertEquals(false, initialValue)
 
             appero.log(ExperienceRating.POSITIVE)
-
 
             val updatedValue = awaitItem()
             assertEquals(true, updatedValue)
@@ -772,7 +769,8 @@ class ApperoTest {
 
         val isConnectedStateField = NetworkMonitor::class.java.getDeclaredField("isConnectedState")
         isConnectedStateField.isAccessible = true
-        val isConnectedState = isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
+        val isConnectedState =
+            isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
         isConnectedState.value = true
 
         // When
@@ -780,7 +778,6 @@ class ApperoTest {
             skipItems(1) // Skip initial value
 
             appero.log(ExperienceRating.POSITIVE)
-
 
             val updatedStrings = awaitItem()
             assertEquals("API Title", updatedStrings.title)
@@ -840,7 +837,8 @@ class ApperoTest {
 
         val isConnectedStateField = NetworkMonitor::class.java.getDeclaredField("isConnectedState")
         isConnectedStateField.isAccessible = true
-        val isConnectedState = isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
+        val isConnectedState =
+            isConnectedStateField.get(networkMonitor) as kotlinx.coroutines.flow.MutableStateFlow<Boolean>
         isConnectedState.value = true
 
         // When
@@ -849,7 +847,6 @@ class ApperoTest {
             assertEquals(FlowType.NEUTRAL, initialValue)
 
             appero.log(ExperienceRating.POSITIVE)
-
 
             val updatedValue = awaitItem()
             assertEquals(FlowType.POSITIVE, updatedValue)
@@ -882,7 +879,6 @@ class ApperoTest {
         // When
         appero.log(ExperienceRating.POSITIVE, "Queued experience")
 
-
         // Then - Verify data was persisted
         val dataStorage = ApperoDataStorage(context)
         val loadedData = dataStorage.load().getOrNull()
@@ -912,7 +908,6 @@ class ApperoTest {
 
         // When
         appero.postFeedback(ExperienceRating.POSITIVE, "Offline feedback")
-
 
         // Then - Verify data was persisted
         val dataStorage = ApperoDataStorage(context)
@@ -979,7 +974,6 @@ class ApperoTest {
 
         // When - Trigger a state update by logging
         appero.log(ExperienceRating.POSITIVE, "Test")
-
 
         // Then - Verify data was saved
         val savedData = dataStorage.load().getOrNull()

@@ -56,14 +56,22 @@ internal fun ApperoFeedbackContent(
     val flowType by apperoInstance.flowType.collectAsState()
 
     // Internal navigation state
-    var currentScreen by remember { mutableStateOf(when(flowType) {
-        FlowType.POSITIVE, FlowType.NEUTRAL -> Screen.Rating
-        FlowType.NEGATIVE -> Screen.FeedbackInput
-    })}
-    var selectedRating by remember { mutableStateOf(when (flowType){
-        FlowType.NEGATIVE -> ExperienceRating.STRONG_NEGATIVE
-        else -> null
-    }) }
+    var currentScreen by remember {
+        mutableStateOf(
+            when (flowType) {
+                FlowType.POSITIVE, FlowType.NEUTRAL -> Screen.Rating
+                FlowType.NEGATIVE -> Screen.FeedbackInput
+            }
+        )
+    }
+    var selectedRating by remember {
+        mutableStateOf(
+            when (flowType) {
+                FlowType.NEGATIVE -> ExperienceRating.STRONG_NEGATIVE
+                else -> null
+            }
+        )
+    }
     var feedbackText by remember { mutableStateOf("") }
     var isSubmitting by remember { mutableStateOf(false) }
 

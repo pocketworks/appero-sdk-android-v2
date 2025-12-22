@@ -11,7 +11,7 @@ Complete guide for integrating the Appero SDK into your Android application.
 
 ## Installation
 
-### Option 1: Local Module (Current)
+### Option 1: Local Module
 
 1. Clone or download the Appero SDK repository
 2. Add the `:main` module to your project's `settings.gradle.kts`:
@@ -21,7 +21,7 @@ include(":main")
 project(":main").projectDir = file("path/to/ApperoSDKAndroid/main")
 ```
 
-3. Add the dependency in your app's `build.gradle.kts`:
+3. Add the dependency in your module's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
@@ -29,11 +29,11 @@ dependencies {
 }
 ```
 
-### Option 2: Maven/JitPack (Future)
+### Option 2: Maven Central
 
 ```kotlin
 dependencies {
-    implementation("uk.co.pocketworks:appero-sdk:1.0.0-alpha")
+    implementation("uk.co.pocketworks.appero:sdk-android:<latest-version>")
 }
 ```
 
@@ -44,10 +44,9 @@ dependencies {
 Add the Appero SDK module to your project:
 
 ```kotlin
-// In your app's build.gradle.kts
+// In your module's build.gradle.kts
 dependencies {
-    implementation(project(":main"))
-    // Or when published: implementation("uk.co.pocketworks:appero-sdk:1.0.0-alpha")
+    implementation("uk.co.pocketworks.appero:sdk-android:<latest-version>")
 }
 ```
 
@@ -70,28 +69,24 @@ class MyApplication : Application() {
 }
 ```
 
-Don't forget to register in `AndroidManifest.xml`:
+Don't forget to register your custom Application in `AndroidManifest.xml`:
 
 ```xml
 
 <application android:name=".MyApplication"/>
 ```
 
-### 3. Display Feedback UI
+### 3. Add the Appero Feedback UI to your screen layout (Jetpack Compose app example)
 
-Observe the feedback prompt state and display the UI:
+Add this composable to your app's composition to enable automatic feedback collection.
+The modal will appear automatically when the Appero SDK determines it's appropriate based on user experiences.
 
 ```kotlin
 @Composable
 fun MyScreen() {
-    val shouldShowFeedback by Appero.instance.shouldShowFeedbackPrompt.collectAsState()
-
     Box {
         MyAppContent()
-
-        if (shouldShowFeedback) {
-            ApperoFeedbackUI()
-        }
+        ApperoFeedbackBottomSheet()
     }
 }
 ```
@@ -112,37 +107,6 @@ Appero.instance.log(
 ```
 
 That's it! The SDK handles everything else automatically.
-
-## Core Concepts
-
-### Experience Logging
-
-The SDK tracks user experiences and automatically determines when to show a feedback prompt based on:
-- **3+ positive ratings** → Prompts for positive feedback
-- **1 negative rating** → Immediately prompts for negative feedback
-- **Offline queueing** → Experiences are queued when offline and sent when online
-
-### Feedback Flows
-
-Three distinct flows based on user sentiment:
-- **Positive Flow:** Thank you message, optional text feedback
-- **Neutral Flow:** Asks what could be improved
-- **Negative Flow:** Apologizes, asks what went wrong
-
-### Offline Support
-
-The SDK handles offline scenarios gracefully:
-- Experiences logged while offline are queued locally
-- Automatic retry every 3 minutes when online
-- Network state monitoring with reconnection handling
-- JSON file storage in app's internal storage
-
-### Rating Options
-- `ExperienceRating.STRONG_POSITIVE` (5) - 😄 Very satisfied
-- `ExperienceRating.POSITIVE` (4) - 🙂 Satisfied
-- `ExperienceRating.NEUTRAL` (3) - 😐 Neutral
-- `ExperienceRating.NEGATIVE` (2) - 🙁 Dissatisfied
-- `ExperienceRating.STRONG_NEGATIVE` (1) - 😡 Very dissatisfied
 
 ## Analytics Integration
 
@@ -200,17 +164,13 @@ Appero provides three built-in themes and supports custom branding.
 
 ```kotlin
 // System theme (default)
-ApperoFeedbackUI()
+ApperoFeedbackBottomSheet()
 
 // Fixed light theme
-ApperoFeedbackUI(customTheme = LightApperoTheme)
+ApperoFeedbackBottomSheet(customTheme = LightApperoTheme)
 
 // Fixed dark theme
-ApperoFeedbackUI(customTheme = DarkApperoTheme)
-
-// Dynamic based on app theme
-val theme = if (isSystemInDarkTheme()) DarkApperoTheme else LightApperoTheme
-ApperoFeedbackUI(customTheme = theme)
+ApperoFeedbackBottomSheet(customTheme = DarkApperoTheme)
 ```
 
 ### Custom Brand Theme
@@ -222,40 +182,24 @@ object MyBrandTheme : ApperoTheme {
     override val colors = ApperoLightColors(
         primary = Color(0xFF6200EE),      // Your brand color
         onPrimary = Color.White,
-        background = Color.White,
         surface = Color.White,
         onSurface = Color(0xFF1C1B1F),
         onSurfaceVariant = Color(0xFF49454F),
-        // Rating colors (or use defaults)
-        rating1 = Color(0xFFD64545),
-        rating2 = Color(0xFFE87E3C),
-        rating3 = Color(0xFFC99A1F),
-        rating4 = Color(0xFF4A9E4E),
-        rating5 = Color(0xFF3D8B41)
     )
-    override val typography = ApperoTypography()
+    override val typography = DefaultApperoTypography()
     override val shapes = ApperoShapes()
+    override val ratingImages = DefaultApperoRatingImages()
 }
 
 // Use your custom theme
-ApperoFeedbackUI(customTheme = MyBrandTheme)
+ApperoFeedbackBottomSheet(customTheme = MyBrandTheme)
 ```
-
-**Note:** All colors must meet WCAG 2.2 AA contrast requirements (4.5:1 for text, 3:1 for UI components).
 
 ## Advanced Usage
 
-### Updating User ID
-
-Set or update the user ID at any time:
-
-```kotlin
-Appero.instance.userId = "new_user_id"
-```
-
 ## Permissions
 
-Add these permissions to your `AndroidManifest.xml`:
+Appero declares these permissions in its `AndroidManifest.xml`:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
@@ -285,14 +229,21 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues and solutions.
 
 ## Sample App
 
-Run the `:sample` module to see a complete integration example matching the iOS reference design.
+Run the `:sample-compose` module to see a complete integration example in an app built with Jetpack Compose.
+To see an integration example in a an app built with XML layouts, run the `:sample-xml` module.
+
+Make sure to substitute your api-key in the `SampleApplication` class in order to be able to send events to the
+Appero back-end.
+
+## Contributing
+
+Contributions are welcome!
 
 ## Support
 
 For issues or questions:
-- GitHub Issues: [github.com/pocketworks/appero-sdk-android/issues](https://github.com/pocketworks/appero-sdk-android/issues)
-- Documentation: [README.md](README.md)
+- GitHub Issues: [GitHub Issues](https://github.com/pocketworks/appero-sdk-android-v2/issues)
 
 ## License
 
-MIT License - See LICENSE file for details.
+MIT License - See [LICENSE](LICENCE) file for details.

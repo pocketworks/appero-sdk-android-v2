@@ -39,41 +39,14 @@ import uk.co.pocketworks.appero.sdk.main.ui.screens.ThankYouScreen
  *
  * This composable contains all flow logic and state management but does NOT
  * include modal presentation (ModalBottomSheet, Dialog, etc.). Wrappers like
- * [ApperoFeedbackBottomSheet] or [uk.co.pocketworks.appero.sdk.main.ui.xml.ApperoFeedbackComposeView] handle presentation.
- *
- * **Usage in ModalBottomSheet:**
- * ```kotlin
- * ModalBottomSheet(...) {
- *     ApperoFeedbackContent(
- *         apperoInstance = Appero.instance,
- *         onDismiss = { Appero.instance.dismissApperoPrompt() }
- *     )
- * }
- * ```
- *
- * **Usage in Dialog/DialogFragment:**
- * ```kotlin
- * Dialog(onDismissRequest = { ... }) {
- *     Surface {
- *         ApperoFeedbackContent(
- *             apperoInstance = Appero.instance,
- *             onDismiss = { dismiss() }
- *         )
- *     }
- * }
- * ```
- *
- * **WCAG Compliance:**
- * - All child screens implement WCAG 2.2 AA standards
- * - Proper semantic structure for screen readers
- * - Content size adapts to text scaling
+ * [ApperoFeedbackBottomSheet] or [ApperoFeedbackComposeView] handle presentation.
  *
  * @param apperoInstance The Appero SDK instance (defaults to singleton)
  * @param onDismiss Callback when flow should be dismissed (e.g., from ThankYou screen)
  * @param modifier Optional modifier for customization
  */
 @Composable
-fun ApperoFeedbackContent(
+internal fun ApperoFeedbackContent(
     modifier: Modifier = Modifier,
     apperoInstance: Appero = Appero.instance,
     onDismiss: () -> Unit,
@@ -83,14 +56,22 @@ fun ApperoFeedbackContent(
     val flowType by apperoInstance.flowType.collectAsState()
 
     // Internal navigation state
-    var currentScreen by remember { mutableStateOf(when(flowType) {
-        FlowType.POSITIVE, FlowType.NEUTRAL -> Screen.Rating
-        FlowType.NEGATIVE -> Screen.FeedbackInput
-    })}
-    var selectedRating by remember { mutableStateOf(when (flowType){
-        FlowType.NEGATIVE -> ExperienceRating.STRONG_NEGATIVE
-        else -> null
-    }) }
+    var currentScreen by remember {
+        mutableStateOf(
+            when (flowType) {
+                FlowType.POSITIVE, FlowType.NEUTRAL -> Screen.Rating
+                FlowType.NEGATIVE -> Screen.FeedbackInput
+            }
+        )
+    }
+    var selectedRating by remember {
+        mutableStateOf(
+            when (flowType) {
+                FlowType.NEGATIVE -> ExperienceRating.STRONG_NEGATIVE
+                else -> null
+            }
+        )
+    }
     var feedbackText by remember { mutableStateOf("") }
     var isSubmitting by remember { mutableStateOf(false) }
 

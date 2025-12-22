@@ -11,6 +11,8 @@ package uk.co.pocketworks.appero.sdk.main.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import uk.co.pocketworks.appero.sdk.main.util.ApperoLogger
 
 /**
  * Internal data class representing the response from the experiences API endpoint.
@@ -35,5 +37,17 @@ internal data class ExperienceResponse(
      */
     fun getFlowTypeEnum(): FlowType {
         return FlowType.fromApiValue(flowType)
+    }
+
+    companion object {
+        fun fromBytes(bytes: ByteArray): ExperienceResponse? {
+            return try {
+                val json = Json { ignoreUnknownKeys = true }
+                json.decodeFromString<ExperienceResponse>(bytes.decodeToString())
+            } catch (e: Exception) {
+                ApperoLogger.log("Failed to parse experience response: ${e.message}")
+                null
+            }
+        }
     }
 }

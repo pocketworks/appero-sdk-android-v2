@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -70,7 +69,6 @@ fun RatingButton(
     )
 
     // Get painter from theme with context for cross-module resource access
-    val context = LocalContext.current
     val theme = localApperoTheme.current
     val painter = theme.ratingImages.getPainterForRating(rating)
 

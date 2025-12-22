@@ -14,6 +14,7 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
@@ -54,7 +55,7 @@ internal object ApperoAPIClient {
      * Creates and configures the Ktor HttpClient instance.
      * @param isDebug Whether debug logging is enabled
      */
-    fun createHttpClient(isDebug: Boolean = false): HttpClient {
+    private fun createHttpClient(isDebug: Boolean = false): HttpClient {
         return HttpClient(Android) {
             install(ContentNegotiation) {
                 json(
@@ -73,7 +74,12 @@ internal object ApperoAPIClient {
 
             if (isDebug) {
                 install(Logging) {
-                    level = LogLevel.ALL
+                    level = LogLevel.BODY
+                    logger = object : Logger {
+                        override fun log(message: String) {
+                            android.util.Log.d("ApperoAPI", message)
+                        }
+                    }
                 }
             }
         }
@@ -100,8 +106,6 @@ internal object ApperoAPIClient {
 
         return try {
             val url = "$BASE_URL/$endpoint"
-
-            ApperoLogger.log("Sending $method request to $url")
 
             val response: HttpResponse = when (method) {
                 HttpMethod.POST -> {

@@ -22,7 +22,7 @@ import androidx.compose.runtime.CompositionLocalProvider
  * Example usage:
  * ```kotlin
  * ApperoThemeProvider(theme = CustomApperoTheme) {
- *     ApperoFeedbackUI()
+ *     ApperoFeedbackBottomSheet()
  * }
  * ```
  *

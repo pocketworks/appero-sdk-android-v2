@@ -1,5 +1,5 @@
 //
-//  ApperoFeedbackUI.kt
+//  ApperoFeedbackBottomSheet.kt
 //  Appero SDK
 //
 //  MIT License
@@ -32,16 +32,6 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
  * feedback collection. The modal will appear automatically when the
  * Appero SDK determines it's appropriate based on user experiences.
  *
- * **WCAG 2.2 Level AA Accessibility:**
- * This component is fully accessible with:
- * - TalkBack/screen reader compatibility
- * - Minimum 48dp touch targets (64dp for rating icons)
- * - 4.5:1 text contrast, 3:1 UI element contrast
- * - Supports text scaling up to 200%
- * - Proper focus management and keyboard navigation
- * - Screen reader announcements for state changes
- * - Information conveyed by both color and shape
- *
  * **Example usage:**
  * ```kotlin
  * @Composable
@@ -50,14 +40,14 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
  *         MyScreen()
  *
  *         // Add Appero feedback UI
- *         ApperoFeedbackUI()
+ *         ApperoFeedbackBottomSheet()
  *     }
  * }
  * ```
  *
  * **With custom theme:**
  * ```kotlin
- * ApperoFeedbackUI(theme = CustomApperoTheme)
+ * ApperoFeedbackBottomSheet(theme = CustomApperoTheme)
  * ```
  *
  * @param apperoInstance The Appero SDK instance (defaults to singleton)

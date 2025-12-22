@@ -52,6 +52,7 @@ data class ApperoShapes(
      * Fully rounded shape for circular elements (rating buttons).
      * References: @integer/appero_shape_corner_circle_percent (50%)
      */
+    @Suppress("detekt:MagicNumber")
     val circle: Shape = RoundedCornerShape(50),
 ) {
     companion object {

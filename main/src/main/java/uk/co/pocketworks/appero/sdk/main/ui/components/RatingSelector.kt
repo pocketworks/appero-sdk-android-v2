@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,7 +59,7 @@ fun RatingSelector(
         ExperienceRating.entries.forEach { rating ->
             Box(
                 modifier = Modifier
-                    .weight(1f)  // Equal space for all buttons
+                    .weight(1f)
                     .padding(all = 8.dp)
                     .height(56.dp)
             ) {

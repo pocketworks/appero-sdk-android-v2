@@ -1,0 +1,56 @@
+workflows:
+  code-check:
+    name: Code Check
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      java: 17
+    triggering:
+      events:
+        - pull_request
+      branch_patterns:
+        - pattern: '*'
+          include: true
+          source: true
+      cancel_previous_builds: true
+    scripts:
+      - name: Set up local properties
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Run detekt
+        script: |
+          ./gradlew detekt
+        ignore_failure: false
+      - name: Run tests
+        script: |
+          ./gradlew :main:testDebugUnitTest
+        ignore_failure: false
+    artifacts:
+      - main/build/reports/detekt/detekt.html
+      - main/build/reports/tests/testDebugUnitTest/index.html
+  publish-to-maven:
+    name: Publish to Maven Central
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      java: 17
+      groups:
+        - MAVEN_PUBLISH
+    scripts:
+      - name: Set up local properties
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Run detekt
+        script: |
+          ./gradlew detekt
+        ignore_failure: false
+      - name: Run tests
+        script: |
+          ./gradlew :main:testDebugUnitTest
+        ignore_failure: false
+      - name: Publish to Maven
+        script: |
+          ./gradlew :main:publishToMavenCentral
+    artifacts:
+      - main/build/reports/detekt/detekt.html
+      - main/build/reports/tests/testDebugUnitTest/index.html

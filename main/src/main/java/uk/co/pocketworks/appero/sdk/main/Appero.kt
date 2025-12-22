@@ -10,10 +10,12 @@
 package uk.co.pocketworks.appero.sdk.main
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -24,7 +26,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import uk.co.pocketworks.appero.sdk.main.analytics.IApperoAnalytics
 import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIClient
 import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIError
@@ -108,6 +109,14 @@ class Appero private constructor() : LifecycleEventObserver {
      * Optional delegate for analytics integration.
      */
     var analyticsDelegate: IApperoAnalytics? = null
+
+    /**
+     * Coroutine dispatcher for background operations.
+     * Defaults to Dispatchers.IO in production.
+     * Can be overridden for testing purposes.
+     */
+    @VisibleForTesting
+    internal var backgroundDispatcher: CoroutineDispatcher = Dispatchers.IO
 
     // Internal mutable StateFlows
     private val shouldShowFeedbackPromptState = MutableStateFlow(false)
@@ -319,7 +328,7 @@ class Appero private constructor() : LifecycleEventObserver {
             detail = detail
         )
 
-        scope.launch(Dispatchers.IO) {
+        scope.launch(backgroundDispatcher) {
             postExperience(experienceRecord)
         }
     }
@@ -428,12 +437,8 @@ class Appero private constructor() : LifecycleEventObserver {
             item = experience,
             queueAction = ::queueExperience,
             onSuccess = { responseBytes ->
-                try {
-                    val json = Json { ignoreUnknownKeys = true }
-                    val response = json.decodeFromString<ExperienceResponse>(responseBytes.decodeToString())
-                    handleExperienceResponse(response)
-                } catch (e: Exception) {
-                    ApperoLogger.log("Failed to parse experience response: ${e.message}")
+                ExperienceResponse.fromBytes(responseBytes)?.let {
+                    handleExperienceResponse(it)
                 }
             }
         )

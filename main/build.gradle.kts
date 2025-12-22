@@ -1,3 +1,4 @@
+import com.vanniktech.maven.publish.SonatypeHost
 import java.util.Properties
 
 plugins {
@@ -42,6 +43,13 @@ android {
         consumerProguardFiles("consumer-rules.pro")
 
         buildConfigField("String", "SDK_VERSION", "\"${versionName}\"")
+    }
+
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+            isIncludeAndroidResources = true
+        }
     }
 
     buildTypes {
@@ -105,9 +113,15 @@ dependencies {
     detektPlugins(libs.detekt.formatting)
 
     testImplementation(libs.junit)
+    testImplementation(kotlin("test"))
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    testImplementation(kotlin("test"))
 }
 
 // Maven Publishing Configuration
@@ -168,8 +182,8 @@ mavenPublishing {
         }
     }
 
-    // Configure publishing to Maven Central (OSSRH s01)
-    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01, automaticRelease = true)
+    // Configure publishing to Maven Central
+    publishToMavenCentral(host = SonatypeHost.CENTRAL_PORTAL, automaticRelease = false)
 
     // Enable GPG signing for all publications
     signAllPublications()

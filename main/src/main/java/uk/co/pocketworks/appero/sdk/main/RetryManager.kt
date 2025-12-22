@@ -17,7 +17,9 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIClient
 import uk.co.pocketworks.appero.sdk.main.api.ApperoAPIResponse
+import uk.co.pocketworks.appero.sdk.main.model.ApperoData
 import uk.co.pocketworks.appero.sdk.main.model.Experience
+import uk.co.pocketworks.appero.sdk.main.model.ExperienceResponse
 import uk.co.pocketworks.appero.sdk.main.model.QueuedFeedback
 import uk.co.pocketworks.appero.sdk.main.network.NetworkMonitor
 import uk.co.pocketworks.appero.sdk.main.storage.ApperoDataStorage
@@ -35,7 +37,7 @@ internal class RetryManager(
     private val apiKey: String?,
     private val userId: String?,
     private val isDebug: Boolean,
-    private val onDataUpdate: (uk.co.pocketworks.appero.sdk.main.model.ApperoData) -> Unit,
+    private val onDataUpdate: (ApperoData) -> Unit,
     private val scope: CoroutineScope,
 ) {
     private var retryJob: Job? = null
@@ -111,6 +113,7 @@ internal class RetryManager(
         ApperoLogger.log("Processing ${queuedExperiences.size} unsent experiences")
 
         val successfullyProcessed = mutableListOf<Experience>()
+        var shouldShowFeedback = false
 
         for ((index, experience) in queuedExperiences.withIndex()) {
             val experienceData = mapOf(
@@ -134,6 +137,11 @@ internal class RetryManager(
                 is ApperoAPIResponse.Success -> {
                     ApperoLogger.log("Experience posted successfully")
                     successfullyProcessed.add(experience)
+
+                    val response = ExperienceResponse.fromBytes(result.data)
+                    if (!shouldShowFeedback && response != null) {
+                        shouldShowFeedback = response.shouldShowFeedbackUI
+                    }
                 }
 
                 is ApperoAPIResponse.Error -> {
@@ -147,7 +155,8 @@ internal class RetryManager(
         // Remove successfully processed experiences
         if (successfullyProcessed.isNotEmpty()) {
             val updatedData = currentData.copy(
-                unsentExperiences = queuedExperiences.filterNot { it in successfullyProcessed }
+                unsentExperiences = queuedExperiences.filterNot { it in successfullyProcessed },
+                feedbackPromptShouldDisplay = shouldShowFeedback
             )
             storage.save(updatedData)
             onDataUpdate(updatedData)

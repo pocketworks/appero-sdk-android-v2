@@ -1,3 +1,4 @@
+import com.vanniktech.maven.publish.SonatypeHost
 import java.util.Properties
 
 plugins {
@@ -182,7 +183,7 @@ mavenPublishing {
     }
 
     // Configure publishing to Maven Central
-    publishToMavenCentral(automaticRelease = false)
+    publishToMavenCentral(host = SonatypeHost.CENTRAL_PORTAL, automaticRelease = false)
 
     // Enable GPG signing for all publications
     signAllPublications()

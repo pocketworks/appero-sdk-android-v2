@@ -182,7 +182,7 @@ mavenPublishing {
     }
 
     // Configure publishing to Maven Central (OSSRH s01)
-    publishToMavenCentral(automaticRelease = false)
+    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01, automaticRelease = false)
 
     // Enable GPG signing for all publications
     signAllPublications()

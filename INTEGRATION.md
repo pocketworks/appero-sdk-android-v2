@@ -76,7 +76,9 @@ Don't forget to register your custom Application in `AndroidManifest.xml`:
 <application android:name=".MyApplication"/>
 ```
 
-### 3. Add the Appero Feedback UI to your screen layout (Jetpack Compose app example)
+### 3. Add the Appero Feedback UI to your screen layout
+
+#### Option A: Jetpack Compose Apps
 
 Add this composable to your app's composition to enable automatic feedback collection.
 The modal will appear automatically when the Appero SDK determines it's appropriate based on user experiences.
@@ -90,6 +92,77 @@ fun MyScreen() {
     }
 }
 ```
+
+#### Option B: XML-based Apps (using DialogFragment)
+
+For XML-based apps, use the `ApperoFeedbackDialogFragment` to show the feedback UI as a bottom sheet dialog.
+The SDK will automatically trigger the dialog when appropriate.
+
+**Step 1: Observe the feedback prompt state**
+
+In your Activity or Fragment, observe the SDK's `shouldShowFeedbackPrompt` state:
+
+```kotlin
+class MainActivity : AppCompatActivity() {
+    private var feedbackDialog: ApperoFeedbackDialogFragment? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        observeFeedbackPrompt()
+    }
+
+    private fun observeFeedbackPrompt() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                Appero.instance.shouldShowFeedbackPrompt.collect { shouldShow ->
+                    if (shouldShow) {
+                        showFeedbackDialog()
+                    } else {
+                        dismissFeedbackDialog()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showFeedbackDialog() {
+        // Don't show if already showing
+        if (feedbackDialog?.isAdded == true) return
+
+        feedbackDialog = ApperoFeedbackDialogFragment().apply {
+            show(supportFragmentManager, "appero_feedback")
+        }
+    }
+
+    private fun dismissFeedbackDialog() {
+        feedbackDialog?.dismiss()
+        feedbackDialog = null
+    }
+}
+```
+
+**Step 2: (Optional) Apply custom theme**
+
+To use a custom theme, set the `customTheme` property before showing the dialog:
+
+```kotlin
+private fun showFeedbackDialog() {
+    if (feedbackDialog?.isAdded == true) return
+
+    feedbackDialog = ApperoFeedbackDialogFragment().apply {
+        customTheme = MyBrandTheme  // Your custom ApperoTheme
+        show(supportFragmentManager, "appero_feedback")
+    }
+}
+```
+
+The dialog will automatically:
+- Display with rounded top corners and a drag handle
+- Adapt to system light/dark mode (or use your custom theme)
+- Dismiss via swipe down, back button, or tap outside
+- Notify the SDK when dismissed
 
 ### 4. Log Experiences
 

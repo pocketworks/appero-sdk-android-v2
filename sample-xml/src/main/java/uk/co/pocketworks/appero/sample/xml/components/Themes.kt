@@ -7,9 +7,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import uk.co.pocketworks.appero.sample.xml.R
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoColors
+import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoRatingImages
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoShapes
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoTheme
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoTypography
+import uk.co.pocketworks.appero.sdk.main.ui.theme.DefaultApperoRatingImages
 import uk.co.pocketworks.appero.sdk.main.ui.theme.DefaultApperoTypography
 
 /**
@@ -26,6 +28,7 @@ object CustomTheme1 : ApperoTheme {
     override val colors: ApperoColors = Theme1Colors()
     override val typography: ApperoTypography = DefaultApperoTypography()
     override val shapes: ApperoShapes = ApperoShapes()
+    override val ratingImages: ApperoRatingImages = DefaultApperoRatingImages()
 }
 
 /**
@@ -35,6 +38,7 @@ object CustomTheme2 : ApperoTheme {
     override val colors: ApperoColors = Theme2Colors()
     override val typography: ApperoTypography = CustomTypography
     override val shapes: ApperoShapes = ApperoShapes()
+    override val ratingImages: ApperoRatingImages = DefaultApperoRatingImages()
 }
 
 data class Theme1Colors(

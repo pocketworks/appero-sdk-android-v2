@@ -17,9 +17,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
 import uk.co.pocketworks.appero.sdk.main.Appero
 import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
+import uk.co.pocketworks.appero.sdk.main.ui.ApperoFeedbackDialogFragment
+import uk.co.pocketworks.appero.sample.xml.components.CustomTheme1
+import uk.co.pocketworks.appero.sample.xml.components.CustomTheme2
 import uk.co.pocketworks.appero.sample.xml.components.ThemeHolder
 import uk.co.pocketworks.appero.sample.xml.databinding.ActivityMainBinding
-import uk.co.pocketworks.appero.sample.xml.dialogs.ApperoFeedbackDialogFragment
 
 /**
  * Main activity demonstrating XML/Views integration with Appero SDK.
@@ -131,7 +133,13 @@ class MainActivity : AppCompatActivity() {
         // Don't show if already showing
         if (feedbackDialog?.isAdded == true) return
 
-        feedbackDialog = ApperoFeedbackDialogFragment.newInstance().apply {
+        feedbackDialog = ApperoFeedbackDialogFragment().apply {
+            // Apply custom theme based on current theme selection
+            customTheme = when (currentTheme) {
+                ThemeMode.CUSTOM_1 -> CustomTheme1
+                ThemeMode.CUSTOM_2 -> CustomTheme2
+                ThemeMode.SYSTEM -> null // Use system theme (light/dark)
+            }
             show(supportFragmentManager, "ApperoFeedbackDialog")
         }
     }

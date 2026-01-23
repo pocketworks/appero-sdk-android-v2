@@ -81,6 +81,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.play.review)
     
     // Serialization
     implementation(libs.kotlinx.serialization.json)

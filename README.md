@@ -10,6 +10,7 @@ and Jetpack Compose.
 ## Features
 
 ✅ **Automatic Feedback Prompts** - Smart triggers based on user experience
+✅ **Play Store Rating** - Automatic in-app rating prompt for positive feedback
 ✅ **Offline Support** - Queues experiences when offline, syncs automatically
 ✅ **Native UI** - Built with Jetpack Compose, fully customizable themes
 ✅ **WCAG 2.2 AA Compliant** - Accessible by default with proper contrast ratios
@@ -48,7 +49,7 @@ Experience Threshold set in the Appero Dashboard.
 ### Feedback Flows
 
 Three distinct flows based on user sentiment:
-- **Positive Flow:** Thank you message, optional text feedback
+- **Positive Flow:** Thank you message, optional text feedback, Play Store rating prompt (ratings 4-5)
 - **Neutral Flow:** Asks what could be improved
 - **Negative Flow:** Apologizes, asks what went wrong
 

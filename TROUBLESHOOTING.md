@@ -9,6 +9,7 @@ Solutions to common issues when integrating the Appero SDK.
 - [Network Issues](#network-issues)
 - [Theme Issues](#theme-issues)
 - [Build Issues](#build-issues)
+- [Play Store Rating Issues](#play-store-rating-issues)
 - [Testing Issues](#testing-issues)
 
 ---
@@ -357,6 +358,40 @@ kotlin = "2.0.21"
 -keep class io.ktor.** { *; }
 -keepclassmembers class io.ktor.** { *; }
 ```
+
+---
+
+## Play Store Rating Issues
+
+### Play Store Rating Not Showing
+
+**Problem:** Users with positive ratings don't see "Rate us" prompt.
+
+**Possible Causes & Solutions:**
+
+1. **Rating not high enough**
+   - Only ratings 4-5 (POSITIVE, STRONG_POSITIVE) trigger the prompt
+   - Ratings 1-3 show standard "Thank you" screen
+
+2. **Activity context not available**
+   - Ensure you're using `ApperoFeedbackBottomSheet` in an Activity context
+   - DialogFragment implementation handles this automatically
+
+3. **Google Play quota reached**
+   - Google limits in-app review frequency
+   - SDK automatically falls back to opening Play Store app/website
+
+---
+
+### In-App Review Not Working in Development
+
+**Problem:** Review dialog doesn't appear during testing.
+
+**Solution:** Google's in-app review only works with published apps. During development, the SDK will automatically fall back to opening the Play Store.
+
+For testing, ensure your app is:
+- Published on Play Store (at least in internal testing track)
+- Installed from Play Store (not via ADB or IDE)
 
 ---
 

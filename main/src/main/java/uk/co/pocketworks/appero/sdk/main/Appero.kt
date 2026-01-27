@@ -9,6 +9,7 @@
 
 package uk.co.pocketworks.appero.sdk.main
 
+import android.app.Activity
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Lifecycle
@@ -148,6 +149,7 @@ class Appero private constructor() : LifecycleEventObserver {
     private var retryManager: RetryManager? = null
     private var scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var isLifecycleObserverRegistered = false
+    private var playStoreReviewManager: PlayStoreReviewManager? = null
 
     // Internal state
     private val apperoDataState = MutableStateFlow<ApperoData?>(null)
@@ -189,6 +191,9 @@ class Appero private constructor() : LifecycleEventObserver {
             prompt = context.getString(R.string.default_ui_prompt)
         )
         feedbackUIStringsState.value = defaultUiStrings
+
+        // Initialize Review Manager
+        playStoreReviewManager = PlayStoreReviewManager()
 
         // Initialize storage
         userPreferencesStorage = UserPreferencesStorage(applicationContext)
@@ -383,6 +388,37 @@ class Appero private constructor() : LifecycleEventObserver {
         updateApperoData({ data ->
             data.copy(feedbackPromptShouldDisplay = false)
         })
+    }
+
+    /**
+     * Request Play Store in-app review flow.
+     *
+     * This method triggers Google Play's in-app review API, which may or may not
+     * show the review dialog to the user (Google controls frequency via quota system).
+     *
+     * If in-app review is not available, automatically falls back to opening
+     * the Play Store app or website.
+     *
+     * @param activity The current activity context
+     */
+    fun requestPlayStoreReview(activity: Activity) {
+        val manager = playStoreReviewManager
+        if (manager == null) {
+            ApperoLogger.log("Cannot request Play Store review - PlayStoreReviewManager not initialized")
+            return
+        }
+
+        ApperoLogger.log("Requesting Play Store review")
+
+        manager.requestReview(
+            activity = activity,
+            config = PlayStoreReviewManager.ReviewConfig(
+                fallbackToExternalStore = true
+            ),
+            onComplete = { result ->
+                ApperoLogger.log("Play Store review completed: $result")
+            }
+        )
     }
 
     /**

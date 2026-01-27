@@ -9,6 +9,7 @@
 
 package uk.co.pocketworks.appero.sdk.main.ui
 
+import android.app.Activity
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import uk.co.pocketworks.appero.sdk.main.Appero
@@ -74,6 +76,10 @@ internal fun ApperoFeedbackContent(
     }
     var feedbackText by remember { mutableStateOf("") }
     var isSubmitting by remember { mutableStateOf(false) }
+
+    // Get Activity for Play Store review (if available)
+    val context = LocalContext.current
+    val activity = remember(context) { context as? Activity }
 
     val scope = rememberCoroutineScope()
 
@@ -140,15 +146,33 @@ internal fun ApperoFeedbackContent(
                 },
             )
 
-            Screen.ThankYou -> ThankYouScreen(
-                onDone = {
-                    // Dismiss and reset state
-                    onDismiss()
-                    currentScreen = Screen.Rating
-                    selectedRating = null
-                    feedbackText = ""
-                },
-            )
+            Screen.ThankYou -> {
+                // Capture current rating in local variable for smart cast
+                val currentRating = selectedRating
+
+                // Create review request callback if activity is available and rating qualifies
+                val onRequestReview = if (activity != null &&
+                                          currentRating != null &&
+                                          currentRating > ExperienceRating.NEUTRAL) {
+                    {
+                        apperoInstance.requestPlayStoreReview(activity)
+                    }
+                } else {
+                    null
+                }
+
+                ThankYouScreen(
+                    rating = currentRating,
+                    onRequestReview = onRequestReview,
+                    onDone = {
+                        // Dismiss and reset state
+                        onDismiss()
+                        currentScreen = Screen.Rating
+                        selectedRating = null
+                        feedbackText = ""
+                    }
+                )
+            }
         }
     }
 }

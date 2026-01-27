@@ -18,6 +18,12 @@
     <string name="appero_thank_you_title">Thank you!</string>
     <string name="appero_thank_you_message">Your feedback helps us improve your experience.</string>
 
+    <!-- Play Store rating strings -->
+    <string name="appero_rate_us_title">Rate us</string>
+    <string name="appero_rate_us_message">Enjoying the app? Rate us on the Play Store!</string>
+    <string name="appero_rate_button">Rate</string>
+    <string name="appero_not_now_button">Not now</string>
+
     <!-- WCAG: Content descriptions (detailed for screen readers) -->
     <string name="appero_rating_1_desc">Very dissatisfied, rate 1 out of 5</string>
     <string name="appero_rating_2_desc">Dissatisfied, rate 2 out of 5</string>

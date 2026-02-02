@@ -116,6 +116,7 @@ internal fun ApperoFeedbackContent(
                 question = questionText,
                 feedbackText = feedbackText,
                 showRatings = flowType != FlowType.NEGATIVE,
+                flowType = flowType,
                 onFeedbackTextChange = { feedbackText = it },
                 isSubmitting = isSubmitting,
                 onRatingSelected = { rating ->

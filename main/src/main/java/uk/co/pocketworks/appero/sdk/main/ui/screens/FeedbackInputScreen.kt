@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import uk.co.pocketworks.appero.sdk.main.R
 import uk.co.pocketworks.appero.sdk.main.model.ExperienceRating
+import uk.co.pocketworks.appero.sdk.main.model.FlowType
 import uk.co.pocketworks.appero.sdk.main.ui.components.FeedbackTextField
 import uk.co.pocketworks.appero.sdk.main.ui.components.RatingSelector
 import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoThemeProvider
@@ -76,6 +77,7 @@ fun FeedbackInputScreen(
     question: String,
     feedbackText: String,
     showRatings: Boolean,
+    flowType: FlowType,
     onFeedbackTextChange: (String) -> Unit,
     onRatingSelected: (ExperienceRating) -> Unit,
     onSendFeedback: () -> Unit,
@@ -147,7 +149,7 @@ fun FeedbackInputScreen(
         // WCAG: Button with 48dp minimum height, loading state announced
         Button(
             onClick = onSendFeedback,
-            enabled = !isSubmitting,
+            enabled = !isSubmitting && !(flowType == FlowType.NEGATIVE && feedbackText.isBlank()),
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 48.dp) // WCAG: Minimum touch target height
@@ -189,6 +191,7 @@ private fun FeedbackInputScreenPositivePreview() {
             selectedRating = ExperienceRating.POSITIVE,
             question = "What made your experience positive?",
             showRatings = true,
+            flowType = FlowType.POSITIVE,
             feedbackText = "",
             onFeedbackTextChange = {},
             onRatingSelected = {},
@@ -209,6 +212,7 @@ private fun FeedbackInputScreenNegativePreview() {
             selectedRating = ExperienceRating.NEGATIVE,
             question = "We're sorry you're not enjoying it. Could you tell us what went wrong?",
             showRatings = false,
+            flowType = FlowType.NEGATIVE,
             feedbackText = "The search feature is not working properly.",
             onFeedbackTextChange = {},
             onRatingSelected = {},
@@ -229,6 +233,7 @@ private fun FeedbackInputScreenLoadingPreview() {
             selectedRating = ExperienceRating.STRONG_POSITIVE,
             question = "What made your experience positive?",
             showRatings = true,
+            flowType = FlowType.POSITIVE,
             feedbackText = "Love the barcode scanner feature!",
             onFeedbackTextChange = {},
             onSendFeedback = {},

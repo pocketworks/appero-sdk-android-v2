@@ -12,6 +12,7 @@ package uk.co.pocketworks.appero.sdk.main.ui
 import android.content.DialogInterface
 import android.content.res.Configuration
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -138,10 +139,18 @@ class ApperoFeedbackDialogFragment : BottomSheetDialogFragment() {
         }
         view.findViewById<LinearLayout>(R.id.apperoFeedbackContainer).background = background
 
-        // Configure dialog window to show rounded corners
+        // Configure dialog window to show rounded corners with blur and dim effect
         dialog?.window?.apply {
             // Set background to transparent so rounded corners are visible
             setBackgroundDrawableResource(android.R.color.transparent)
+
+            // Enable dim background (70% opacity)
+            setDimAmount(0.7f)
+
+            // Add blur effect on Android 12+ (API 31+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                setBackgroundBlurRadius(80)
+            }
         }
     }
 

@@ -64,9 +64,7 @@ fun ThankYouScreen(
     val theme = localApperoTheme.current
 
     // Determine if we should show the rating prompt
-    val shouldShowRatingPrompt = rating != null &&
-            rating > ExperienceRating.NEUTRAL &&
-            onRequestReview != null
+    val shouldShowRatingPrompt = rating != null && rating > ExperienceRating.NEUTRAL && onRequestReview != null
 
     // Select appropriate strings
     val title = if (shouldShowRatingPrompt) {

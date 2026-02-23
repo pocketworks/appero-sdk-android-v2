@@ -26,6 +26,10 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.ApperoTheme
 import uk.co.pocketworks.appero.sdk.main.ui.theme.DarkApperoTheme
 import uk.co.pocketworks.appero.sdk.main.ui.theme.LightApperoTheme
 
+private const val BACKGROUND_SCRIM_ALPHA = 0.7f
+
+private const val BACKGROUND_BLUR_RADIUS = 80
+
 /**
  * A [BottomSheetDialogFragment] that displays the Appero feedback UI for XML-based Android apps.
  *
@@ -131,10 +135,10 @@ class ApperoFeedbackDialogFragment : BottomSheetDialogFragment() {
         val background = GradientDrawable().apply {
             setColor(backgroundColor)
             cornerRadii = floatArrayOf(
-                cornerRadius, cornerRadius,  // top left
-                cornerRadius, cornerRadius,  // top right
-                0f, 0f,                      // bottom right
-                0f, 0f                       // bottom left
+                cornerRadius, cornerRadius,
+                cornerRadius, cornerRadius,
+                0f, 0f,
+                0f, 0f
             )
         }
         view.findViewById<LinearLayout>(R.id.apperoFeedbackContainer).background = background
@@ -145,11 +149,11 @@ class ApperoFeedbackDialogFragment : BottomSheetDialogFragment() {
             setBackgroundDrawableResource(android.R.color.transparent)
 
             // Enable dim background (70% opacity)
-            setDimAmount(0.7f)
+            setDimAmount(BACKGROUND_SCRIM_ALPHA)
 
             // Add blur effect on Android 12+ (API 31+)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                setBackgroundBlurRadius(80)
+                setBackgroundBlurRadius(BACKGROUND_BLUR_RADIUS)
             }
         }
     }

@@ -153,8 +153,9 @@ internal fun ApperoFeedbackContent(
 
                 // Create review request callback if activity is available and rating qualifies
                 val onRequestReview = if (activity != null &&
-                                          currentRating != null &&
-                                          currentRating > ExperienceRating.NEUTRAL) {
+                    currentRating != null &&
+                    currentRating > ExperienceRating.NEUTRAL
+                ) {
                     {
                         apperoInstance.requestPlayStoreReview(activity)
                     }

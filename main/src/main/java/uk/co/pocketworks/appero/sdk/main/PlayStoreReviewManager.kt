@@ -112,7 +112,6 @@ internal class PlayStoreReviewManager {
                     }
                 }
             }
-
         } catch (e: Exception) {
             ApperoLogger.log("Play Store Review - Exception during review request: ${e.message}")
 
@@ -161,11 +160,9 @@ internal class PlayStoreReviewManager {
                 )
                 onComplete?.invoke(ReviewResult.FallbackTriggered)
             }
-
         } catch (e: ActivityNotFoundException) {
             ApperoLogger.log("Play Store Review - No app found to handle Play Store intent: ${e.message}")
             onComplete?.invoke(ReviewResult.Failed("No app available to open Play Store"))
-
         } catch (e: Exception) {
             ApperoLogger.log("Play Store Review - Exception during fallback: ${e.message}")
             onComplete?.invoke(ReviewResult.Failed("Fallback failed: ${e.message}"))
@@ -209,4 +206,4 @@ internal class PlayStoreReviewManager {
 
         requestReview(activity, testConfig, onComplete)
     }
-} 
+}

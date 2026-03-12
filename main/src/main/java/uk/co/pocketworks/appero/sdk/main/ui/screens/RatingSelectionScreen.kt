@@ -40,19 +40,19 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
  * - Proper focus order (close button → title → subtitle → ratings)
  * - All interactive elements meet minimum touch target size
  *
+ * @param modifier Optional modifier for customization
  * @param title Main heading text (from FeedbackUIStrings)
  * @param subtitle Secondary text (from FeedbackUIStrings)
  * @param selectedRating Currently selected rating (null if none)
  * @param onRatingSelected Callback when user selects a rating
- * @param modifier Optional modifier for customization
  */
 @Composable
 fun RatingSelectionScreen(
+    modifier: Modifier = Modifier,
     title: String,
     subtitle: String,
     selectedRating: ExperienceRating?,
     onRatingSelected: (ExperienceRating) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val theme = localApperoTheme.current
 

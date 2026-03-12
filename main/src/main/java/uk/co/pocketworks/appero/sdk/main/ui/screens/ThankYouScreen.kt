@@ -9,17 +9,13 @@
 
 package uk.co.pocketworks.appero.sdk.main.ui.screens
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,8 +36,9 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
  *
  * Displays after feedback is successfully submitted. Has two variants:
  * 1. Standard: "Thank you!" message with "Done" button
- * 2. Rating prompt: "Rate us" message with "Rate" and "Not now" buttons
- *    (shown when rating > NEUTRAL and onRequestReview is provided)
+ * 2. Rating prompt: softer thank-you copy mentioning the App Store, single "Done" button
+ *    that silently triggers the in-app review flow (shown when rating > NEUTRAL and
+ *    onRequestReview is provided)
  *
  * WCAG Compliance:
  * - Live region announcement for screen readers
@@ -49,15 +46,15 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
  * - Centered, focused layout
  * - Buttons minimum 48dp height
  *
- * @param onDone Callback when "Done" or "Not now" button is tapped
  * @param modifier Optional modifier for customization
+ * @param onDone Callback when "Done" button is tapped
  * @param rating Optional rating that triggered this screen (determines variant)
- * @param onRequestReview Optional callback when "Rate" button is tapped
+ * @param onRequestReview Optional callback invoked silently on Done when rating > NEUTRAL
  */
 @Composable
 fun ThankYouScreen(
-    onDone: () -> Unit,
     modifier: Modifier = Modifier,
+    onDone: () -> Unit,
     rating: ExperienceRating? = null,
     onRequestReview: (() -> Unit)? = null,
 ) {
@@ -67,11 +64,7 @@ fun ThankYouScreen(
     val shouldShowRatingPrompt = rating != null && rating > ExperienceRating.NEUTRAL && onRequestReview != null
 
     // Select appropriate strings
-    val title = if (shouldShowRatingPrompt) {
-        stringResource(R.string.appero_rate_us_title)
-    } else {
-        stringResource(R.string.appero_thank_you_title)
-    }
+    val title = stringResource(R.string.appero_thank_you_title)
 
     val message = if (shouldShowRatingPrompt) {
         stringResource(R.string.appero_rate_us_message)
@@ -104,65 +97,25 @@ fun ThankYouScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Button(s)
-        if (shouldShowRatingPrompt) {
-            // Two buttons: Rate and Not now
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Not now button (outlined)
-                OutlinedButton(
-                    onClick = onDone,
-                    modifier = Modifier
-                        .weight(1f)
-                        .heightIn(min = 48.dp), // WCAG: Minimum touch target height
-                    border = BorderStroke(1.dp, theme.colors.onSurfaceVariant),
-                    shape = theme.shapes.medium
-                ) {
-                    Text(
-                        text = stringResource(R.string.appero_not_now_button),
-                        style = theme.typography.labelLarge,
-                        color = theme.colors.onSurface
-                    )
-                }
-
-                // Rate button (filled)
-                Button(
-                    onClick = onRequestReview,
-                    modifier = Modifier
-                        .weight(1f)
-                        .heightIn(min = 48.dp), // WCAG: Minimum touch target height
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = theme.colors.primary,
-                        contentColor = theme.colors.onPrimary
-                    ),
-                    shape = theme.shapes.medium
-                ) {
-                    Text(
-                        text = stringResource(R.string.appero_rate_button),
-                        style = theme.typography.labelLarge
-                    )
-                }
-            }
-        } else {
-            // Single Done button
-            Button(
-                onClick = onDone,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp), // WCAG: Minimum touch target height
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = theme.colors.primary,
-                    contentColor = theme.colors.onPrimary
-                ),
-                shape = theme.shapes.medium
-            ) {
-                Text(
-                    text = stringResource(R.string.appero_done),
-                    style = theme.typography.labelLarge
-                )
-            }
+        // Single Done button
+        Button(
+            onClick = {
+                if (shouldShowRatingPrompt) onRequestReview?.invoke()
+                onDone()
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp), // WCAG: Minimum touch target height
+            colors = ButtonDefaults.buttonColors(
+                containerColor = theme.colors.primary,
+                contentColor = theme.colors.onPrimary
+            ),
+            shape = theme.shapes.medium
+        ) {
+            Text(
+                text = stringResource(R.string.appero_done),
+                style = theme.typography.labelLarge
+            )
         }
     }
 }
@@ -175,7 +128,7 @@ private fun ThankYouScreenStandardPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Rate Us (Positive)")
+@Preview(showBackground = true, name = "Done with Review (Positive)")
 @Composable
 private fun ThankYouScreenRateUsPreview() {
     ApperoThemeProvider {

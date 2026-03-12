@@ -55,6 +55,7 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
  * - Loading state announced to screen readers
  * - Proper heading hierarchy
  *
+ * @param modifier Optional modifier
  * @param title Main heading text
  * @param subtitle Secondary text
  * @param feedbackHint Hint displayed in the feedback input field
@@ -66,10 +67,10 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
  * @param onFeedbackTextChange Callback when feedback text changes
  * @param onSendFeedback Callback when send button is tapped
  * @param isSubmitting Whether feedback is currently being submitted
- * @param modifier Optional modifier
  */
 @Composable
 fun FeedbackInputScreen(
+    modifier: Modifier = Modifier,
     title: String,
     subtitle: String,
     feedbackHint: String,
@@ -82,7 +83,6 @@ fun FeedbackInputScreen(
     onRatingSelected: (ExperienceRating) -> Unit,
     onSendFeedback: () -> Unit,
     isSubmitting: Boolean,
-    modifier: Modifier = Modifier,
 ) {
     val theme = localApperoTheme.current
 

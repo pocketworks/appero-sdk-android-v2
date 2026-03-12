@@ -20,7 +20,7 @@
 
     <!-- Play Store rating strings -->
     <string name="appero_rate_us_title">Rate us</string>
-    <string name="appero_rate_us_message">Enjoying the app? Rate us on the Play Store!</string>
+    <string name="appero_rate_us_message">Thank you for your feedback. If you\'ve found the app helpful, leaving a quick rating on the Play Store really makes a big difference ❤️</string>
     <string name="appero_rate_button">Rate</string>
     <string name="appero_not_now_button">Not now</string>
 

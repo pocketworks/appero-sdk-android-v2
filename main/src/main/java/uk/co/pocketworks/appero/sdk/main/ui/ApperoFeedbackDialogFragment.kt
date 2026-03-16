@@ -127,6 +127,7 @@ class ApperoFeedbackDialogFragment : BottomSheetDialogFragment() {
             if (isDarkMode) DarkApperoTheme else LightApperoTheme
         }
         composeView.theme = apperoTheme
+        composeView.onDismissRequest = { dismiss() }
 
         // Set background with rounded top corners using theme's surface color
         val backgroundColor = apperoTheme.colors.surface.toArgb()

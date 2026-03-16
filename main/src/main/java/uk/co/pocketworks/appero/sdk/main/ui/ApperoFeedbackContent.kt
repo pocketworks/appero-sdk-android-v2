@@ -44,14 +44,15 @@ import uk.co.pocketworks.appero.sdk.main.ui.screens.ThankYouScreen
  * [ApperoFeedbackBottomSheet] or [ApperoFeedbackComposeView] handle presentation.
  *
  * @param apperoInstance The Appero SDK instance (defaults to singleton)
- * @param onDismiss Callback when flow should be dismissed (e.g., from ThankYou screen)
+ * @param onDismiss Callback when flow should be dismissed (e.g., from ThankYou screen).
+ * The optional callback is invoked after dismissal has started or completed, depending on the host.
  * @param modifier Optional modifier for customization
  */
 @Composable
 internal fun ApperoFeedbackContent(
     modifier: Modifier = Modifier,
     apperoInstance: Appero = Appero.instance,
-    onDismiss: () -> Unit,
+    onDismiss: (onDismissed: (() -> Unit)?) -> Unit,
 ) {
     // Observe StateFlows from Appero instance
     val uiStrings by apperoInstance.feedbackUIStrings.collectAsState()
@@ -165,13 +166,11 @@ internal fun ApperoFeedbackContent(
 
                 ThankYouScreen(
                     rating = currentRating,
-                    onRequestReview = onRequestReview,
                     onDone = {
-                        // Dismiss and reset state
-                        onDismiss()
                         currentScreen = Screen.Rating
                         selectedRating = null
                         feedbackText = ""
+                        onDismiss(onRequestReview)
                     }
                 )
             }

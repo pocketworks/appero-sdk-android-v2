@@ -37,8 +37,7 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
  * Displays after feedback is successfully submitted. Has two variants:
  * 1. Standard: "Thank you!" message with "Done" button
  * 2. Rating prompt: softer thank-you copy mentioning the App Store, single "Done" button
- *    that silently triggers the in-app review flow (shown when rating > NEUTRAL and
- *    onRequestReview is provided)
+ *    (shown when rating > NEUTRAL)
  *
  * WCAG Compliance:
  * - Live region announcement for screen readers
@@ -49,19 +48,17 @@ import uk.co.pocketworks.appero.sdk.main.ui.theme.localApperoTheme
  * @param modifier Optional modifier for customization
  * @param onDone Callback when "Done" button is tapped
  * @param rating Optional rating that triggered this screen (determines variant)
- * @param onRequestReview Optional callback invoked silently on Done when rating > NEUTRAL
  */
 @Composable
 fun ThankYouScreen(
     modifier: Modifier = Modifier,
     onDone: () -> Unit,
     rating: ExperienceRating? = null,
-    onRequestReview: (() -> Unit)? = null,
 ) {
     val theme = localApperoTheme.current
 
     // Determine if we should show the rating prompt
-    val shouldShowRatingPrompt = rating != null && rating > ExperienceRating.NEUTRAL && onRequestReview != null
+    val shouldShowRatingPrompt = rating != null && rating > ExperienceRating.NEUTRAL
 
     // Select appropriate strings
     val title = stringResource(R.string.appero_thank_you_title)
@@ -99,10 +96,7 @@ fun ThankYouScreen(
 
         // Single Done button
         Button(
-            onClick = {
-                if (shouldShowRatingPrompt) onRequestReview?.invoke()
-                onDone()
-            },
+            onClick = onDone,
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 48.dp), // WCAG: Minimum touch target height
@@ -134,7 +128,6 @@ private fun ThankYouScreenRateUsPreview() {
     ApperoThemeProvider {
         ThankYouScreen(
             rating = ExperienceRating.STRONG_POSITIVE,
-            onRequestReview = {},
             onDone = {}
         )
     }
@@ -146,7 +139,6 @@ private fun ThankYouScreenNeutralPreview() {
     ApperoThemeProvider {
         ThankYouScreen(
             rating = ExperienceRating.NEUTRAL,
-            onRequestReview = {},
             onDone = {}
         )
     }

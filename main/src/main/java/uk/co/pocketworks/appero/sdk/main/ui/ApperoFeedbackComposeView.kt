@@ -80,6 +80,13 @@ class ApperoFeedbackComposeView @JvmOverloads constructor(
      */
     var apperoInstance: Appero = Appero.Companion.instance
 
+    /**
+     * Optional dismissal handler supplied by the hosting container.
+     *
+     * If unset, dismissal falls back to updating the SDK prompt state only.
+     */
+    var onDismissRequest: (() -> Unit)? = null
+
     @Composable
     override fun Content() {
         ApperoThemeProvider(theme) {
@@ -89,7 +96,10 @@ class ApperoFeedbackComposeView @JvmOverloads constructor(
             ) {
                 ApperoFeedbackContent(
                     apperoInstance = apperoInstance,
-                    onDismiss = { apperoInstance.dismissApperoPrompt() },
+                    onDismiss = { onDismissed ->
+                        (onDismissRequest ?: { apperoInstance.dismissApperoPrompt() }).invoke()
+                        onDismissed?.invoke()
+                    },
                     modifier = Modifier.Companion.padding(
                         start = 24.dp,
                         top = 12.dp,

@@ -81,13 +81,14 @@ fun ApperoFeedbackBottomSheet(
             ) {
                 ApperoFeedbackContent(
                     apperoInstance = apperoInstance,
-                    onDismiss = {
+                    onDismiss = { onDismissed ->
                         // Animate sheet hiding, then dismiss
                         scope.launch {
                             sheetState.hide()
                         }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
                                 onDismiss()
+                                onDismissed?.invoke()
                             }
                         }
                     },

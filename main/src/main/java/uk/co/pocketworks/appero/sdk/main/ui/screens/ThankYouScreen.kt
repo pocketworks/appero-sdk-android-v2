@@ -100,7 +100,7 @@ fun ThankYouScreen(
         // Single Done button
         Button(
             onClick = {
-                if (shouldShowRatingPrompt) onRequestReview?.invoke()
+                if (shouldShowRatingPrompt) onRequestReview()
                 onDone()
             },
             modifier = Modifier

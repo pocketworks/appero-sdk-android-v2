@@ -426,7 +426,7 @@ class Appero private constructor() : LifecycleEventObserver {
      */
     fun triggerShowFeedbackPrompt() {
         updateApperoData({ data ->
-            data.copy(feedbackPromptShouldDisplay = true, flowType = FlowType.POSITIVE)
+            data.copy(feedbackPromptShouldDisplay = true)
         })
     }
 

@@ -15,7 +15,7 @@
     <string name="appero_question_negative">We\'re sorry you\'re not enjoying it. Could you tell us what went wrong?</string>
 
     <!-- Thank you screen -->
-    <string name="appero_thank_you_title">Thank you!</string>
+    <string name="appero_thank_you_title">Thank you</string>
     <string name="appero_thank_you_message">Your feedback helps us improve your experience.</string>
 
     <!-- Play Store rating strings -->

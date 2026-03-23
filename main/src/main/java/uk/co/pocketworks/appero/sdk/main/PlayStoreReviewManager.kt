@@ -71,7 +71,7 @@ internal class PlayStoreReviewManager {
                 when {
                     task.isSuccessful -> {
                         val reviewInfo = task.result
-                        ApperoLogger.log("Play Store Review - In-app review info obtained successfully")
+                        ApperoLogger.log("Play Store Review - In-app review info obtained successfully - $reviewInfo")
 
                         // Launch the in-app review flow
                         val launchReviewFlow = reviewManager.launchReviewFlow(activity, reviewInfo)

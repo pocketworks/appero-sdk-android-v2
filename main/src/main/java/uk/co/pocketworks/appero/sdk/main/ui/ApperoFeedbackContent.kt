@@ -10,6 +10,7 @@
 package uk.co.pocketworks.appero.sdk.main.ui
 
 import android.app.Activity
+import android.content.ContextWrapper
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
@@ -79,7 +80,14 @@ internal fun ApperoFeedbackContent(
 
     // Get Activity for Play Store review (if available)
     val context = LocalContext.current
-    val activity = remember(context) { context as? Activity }
+    val activity = remember(context) {
+        var ctx = context
+        while (ctx is ContextWrapper) {
+            if (ctx is Activity) break
+            ctx = ctx.baseContext
+        }
+        ctx as? Activity
+    }
 
     val scope = rememberCoroutineScope()
 
@@ -152,15 +160,13 @@ internal fun ApperoFeedbackContent(
                 val currentRating = selectedRating
 
                 // Create review request callback if activity is available and rating qualifies
-                val onRequestReview = if (activity != null &&
-                    currentRating != null &&
-                    currentRating > ExperienceRating.NEUTRAL
-                ) {
-                    {
+                val onRequestReview = {
+                    if (activity != null &&
+                        currentRating != null &&
+                        currentRating > ExperienceRating.NEUTRAL
+                    ) {
                         apperoInstance.requestPlayStoreReview(activity)
                     }
-                } else {
-                    null
                 }
 
                 ThankYouScreen(
